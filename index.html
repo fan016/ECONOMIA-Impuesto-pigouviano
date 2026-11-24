@@ -23,7 +23,7 @@
             position: relative; overflow: hidden;
         }
 
-        /* CABECERA */
+        /* CABECERA (Dimensiones) */
         header {
             padding: 15px 15px 10px 15px; background: rgba(30, 41, 59, 0.95);
             border-bottom: 1px solid rgba(255,255,255,0.1); flex-shrink: 0; display: none; 
@@ -38,16 +38,26 @@
         .bar-society { background: var(--society); }
         .bar-nature { background: var(--nature); }
 
-        /* ÁREA CENTRAL */
+        /* ÁREA CENTRAL (Scrollable) */
         main { flex-grow: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; }
 
-        /* INTRO */
-        #intro-screen {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            flex-grow: 1; text-align: center;
+        /* BOTÓN PRINCIPAL (Ahora está ARRIBA) */
+        #btn-action {
+            background: var(--primary); color: white; border: none; padding: 16px; font-size: 16px;
+            font-weight: 700; border-radius: 12px; width: 100%; cursor: pointer; 
+            transition: transform 0.1s, background 0.2s;
+            margin-bottom: 20px; /* Separación con el contenido de abajo */
+            flex-shrink: 0;
         }
-        #intro-screen h1 { color: var(--primary); font-size: 24px; margin-bottom: 15px; }
-        #intro-screen p { font-size: 14px; color: var(--text-muted); margin-bottom: 30px; line-height: 1.6;}
+        #btn-action:active { transform: scale(0.96); }
+        #btn-action:disabled { background: #475569; color: #94a3b8; }
+
+        /* INTRO */
+        #intro-screen { display: flex; flex-direction: column; flex-grow: 1; }
+        .intro-text { text-align: center; margin-bottom: 20px;}
+        .intro-text h1 { color: var(--primary); font-size: 24px; margin-bottom: 15px; }
+        .intro-text p { font-size: 14px; color: var(--text-muted); line-height: 1.6;}
+        
         .input-group { width: 100%; margin-bottom: 30px; }
         .input-group label { display: block; text-align: left; font-size: 13px; margin-bottom: 8px; color: #cbd5e1; font-weight: 600;}
         .input-group input {
@@ -122,19 +132,6 @@
         .history-choice { color: #cbd5e1; font-style: italic; margin-bottom: 5px;}
         .history-feedback { font-size: 11px; color: var(--text-muted); }
 
-        /* BOTÓN */
-        footer {
-            padding: 15px 20px; padding-bottom: calc(15px + env(safe-area-inset-bottom));
-            background: var(--bg-dark); flex-shrink: 0; border-top: 1px solid rgba(255,255,255,0.05);
-            position: relative; z-index: 10;
-        }
-        #btn-action {
-            background: var(--primary); color: white; border: none; padding: 16px; font-size: 16px;
-            font-weight: 700; border-radius: 12px; width: 100%; cursor: pointer; transition: transform 0.1s, background 0.2s;
-        }
-        #btn-action:active { transform: scale(0.96); }
-        #btn-action:disabled { background: #475569; color: #94a3b8; }
-
         @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
@@ -160,10 +157,16 @@
         </header>
 
         <main id="main-content">
+            
+            <!-- BOTÓN PRINCIPAL MOVIDO ARRIBA -->
+            <button id="btn-action">Iniciar Simulación ➔</button>
+
             <!-- INTRO -->
             <div id="intro-screen">
-                <h1>🌱 EcoSim: El Dilema del Cacao</h1>
-                <p>Has sido contratado como el nuevo <b>Gerente General</b> de la planta procesadora. Tu objetivo es tomar decisiones económicas, pero recuerda: cada acción afecta a la sociedad y al medio ambiente.</p>
+                <div class="intro-text">
+                    <h1>🌱 EcoSim: El Dilema del Cacao</h1>
+                    <p>Has sido contratado como el nuevo <b>Gerente General</b> de la planta procesadora. Tu objetivo es tomar decisiones económicas, pero recuerda: cada acción afecta a la sociedad y al medio ambiente.</p>
+                </div>
                 
                 <div class="input-group">
                     <label>Ingresa tu nombre de Gerente:</label>
@@ -219,10 +222,6 @@
                 <div id="history-container"></div>
             </div>
         </main>
-
-        <footer>
-            <button id="btn-action">Iniciar Simulación ➔</button>
-        </footer>
     </div>
 
     <script>
@@ -308,4 +307,7 @@
                 text: "NOTIFICACIÓN: Gerente [NAME], el gobierno ofrece un Pago por Servicios Ambientales (PSA) si conserva el bosque de ribera. Si no lo hace, se duplicará su tasa de impuesto.",
                 options: [
                     { text: "Aceptar el PSA y conservar el bosque.", eco: 15, soc: 15, nat: 30, next: 6, isGood: true, points: 100, feedback: "El PSA es un instrumento económico que recompensa la conservación del bosque de ribera." },
-                    { text: "Talar el bosque.", eco: 20, soc: -10, nat: -30, next: 6, isGood: false, points: 0, feedback: "Talar el bosque genera ganancias a corto plazo pero destruye la cuenca hídrica y la biodiversida
+                    { text: "Talar el bosque.", eco: 20, soc: -10, nat: -30, next: 6, isGood: false, points: 0, feedback: "Talar el bosque genera ganancias a corto plazo pero destruye la cuenca hídrica y la biodiversidad." }
+                ]
+            },
+        
