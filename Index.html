@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador: Impuesto Pigouviano</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --profit: #27ae60;
+            --damage: #c0392b;
+            --tax: #8e44ad;
+            --bg: #ecf0f1;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--primary);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 { text-align: center; font-size: 24px; }
+        .context { text-align: center; font-style: italic; color: #7f8c8d; margin-bottom: 20px;}
+        
+        .simulator { background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #ddd; }
+        .slider-container { margin: 20px 0; text-align: center; }
+        input[type=range] { width: 100%; cursor: pointer; }
+        
+        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .stat-box { padding: 15px; border-radius: 8px; background: white; text-align: center; border-left: 5px solid; }
+        .stat-box.profit { border-color: var(--profit); }
+        .stat-box.damage { border-color: var(--damage); }
+        .stat-box.tax { border-color: var(--tax); display: none; }
+        .stat-box h3 { margin: 0 0 10px 0; font-size: 14px; color: #7f8c8d; text-transform: uppercase;}
+        .stat-box p { margin: 0; font-size: 24px; font-weight: bold; }
+        
+        .tax-control {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8daef;
+            border-radius: 8px;
+        }
+        .tax-control input { transform: scale(1.5); margin-right: 15px; cursor: pointer; }
+        
+        .alert { padding: 15px; border-radius: 8px; margin-top: 20px; display: none; text-align: center; font-weight: bold; }
+        .alert.danger { background: #fadbd8; color: var(--damage); }
+        .alert.success { background: #d5f5e3; color: var(--profit); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🏭 Planta Extractora de Cacao</h1>
+    <p class="context">Toma decisiones para maximizar tu ganancia. ¡Cuidado con el impacto social!</p>
+
+    <div class="simulator">
+        <div class="slider-container">
+            <label for="production">Selecciona tu nivel de producción (Toneladas):</label>
+            <h2 id="production-label">10 Toneladas</h2>
+            <input type="range" id="production" min="0" max="20" value="10" step="1">
+        </div>
+
+        <div class="stats">
+            <div class="stat-box profit">
+                <h3>Ganancia Privada</h3>
+                <p id="profit-val">$0</p>
+            </div>
+            <div class="stat-box damage">
+                <h3>Costo Social (Daño)</h3>
+                <p id="damage-val">$0</p>
+            </div>
+            <div class="stat-box tax" id="tax-box">
+                <h3>Impuesto Pagado</h3>
+                <p id="tax-val">$0</p>
+            </div>
+        </div>
+
+        <div class="tax-control">
+            <input type="checkbox" id="tax-toggle">
+            <label for="tax-toggle"><strong>Aplicar Impuesto Pigouviano ($10 por ton)</strong></label>
+        </div>
+
+        <div class="alert danger" id="alert-danger">
+            ⚠️ ¡Estás produciendo demasiado! El daño a la comunidad supera tu beneficio.
+        </div>
+        <div class="alert success" id="alert-success">
+            ✅ ¡Nivel óptimo! El impuesto ha alineado tu producción con el bienestar social.
+        </div>
+    </div>
+</div>
+
+<script>
+    // Lógica del juego
+    const slider = document.getElementById('production');
+    const label = document.getElementById('production-label');
+    const profitVal = document.getElementById('profit-val');
+    const damageVal = document.getElementById('damage-val');
+    const taxToggle = document.getElementById('tax-toggle');
+    const taxBox = document.getElementById('tax-box');
+    const taxVal = document.getElementById('tax-val');
+    const alertDanger = document.getElementById('alert-danger');
+    const alertSuccess = document.getElementById('alert-success');
+
+    const marginalProfit = 15; // Ganancia por tonelada
+    const marginalDamage = 10; // Daño social por tonelada (El impuesto debe igualar esto)
+    const taxRate = 10; // Valor del impuesto
+
+    function updateGame() {
+        let production = parseInt(slider.value);
+        label.innerText = `${production} Toneladas`;
+
+        // Cálculos
+        let privateProfit = production * marginalProfit;
+        let socialDamage = production * marginalDamage;
+        
+        profitVal.innerText = `$${privateProfit}`;
+        damageVal.innerText = `$${socialDamage}`;
+        
+        alertDanger.style.display = 'none';
+        alertSuccess.style.display = 'none';
+
+        if (taxToggle.checked) {
+            taxBox.style.display = 'block';
+            let taxPaid = production * taxRate;
+            taxVal.innerText = `$${taxPaid}`;
+            
+            // Ganancia neta = Ganancia privada - Impuesto
+            let netProfit = privateProfit - taxPaid;
+            profitVal.innerText = `$${netProfit} (Neta)`;
+            profitVal.style.color = netProfit >= 0 ? 'var(--profit)' : 'var(--damage)';
+
+            // Lógica para el mensaje del profesor
+            if (production > 10) {
+                alertDanger.style.display = 'block';
+                alertDanger.innerText = "⚠️ Sigues produciendo demasiado. El impuesto reduce tu ganancia, pero el daño social sigue siendo alto. Intenta bajar la producción.";
+            } else {
+                alertSuccess.style.display = 'block';
+                alertSuccess.innerText = "✅ ¡Óptimo social! Al producir 10 toneladas (donde Ganancia Marginal = Daño Marginal), maximizas el beneficio sin destruir el entorno.";
+            }
+        } else {
+            taxBox.style.display = 'none';
+            profitVal.style.color = 'var(--profit)';
+            
+            if (production > 10) {
+                alertDanger.style.display = 'block';
+                alertDanger.innerText = "⚠️ Estás ignorando el costo social. La empresa gana, pero la comunidad pierde más de lo que tú ganas.";
+            }
+        }
+    }
+
+    slider.addEventListener('input', updateGame);
+    taxToggle.addEventListener('change', updateGame);
+
+    // Inicializar
+    updateGame();
+</script>
+
+</body>
+</html>
