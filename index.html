@@ -7,310 +7,436 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-dark: #0f172a; --panel-bg: #1e293b; --text-main: #f8fafc;
-            --text-muted: #94a3b8; --primary: #3b82f6; --success: #10b981;
-            --danger: #ef4444; --warning: #f59e0b; --nature: #06b6d4;
-            --society: #f97316; --state-color: #8b5cf6;
+            --bg-dark: #0f172a;
+            --panel-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #3b82f6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --nature: #06b6d4;
+            --society: #f97316;
+            --transition-speed: 0.8s;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
-        
-        html, body { 
-            height: 100%; width: 100%; margin: 0; 
-            background-color: var(--bg-dark); overflow: hidden; 
+        * { 
+            box-sizing: border-box; margin: 0; padding: 0; 
+            font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent;
         }
 
-        /* CONTENEDOR PRINCIPAL */
+        body {
+            /* El fondo cambiará con JS dependiendo de la naturaleza */
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex; justify-content: center;
+            height: 100dvh; overflow: hidden; 
+            transition: background-color var(--transition-speed) ease;
+        }
+
         #app {
-            width: 100%; height: 100dvh; display: flex; flex-direction: column; 
-            background: var(--bg-dark); position: relative;
+            width: 100%; max-width: 480px; height: 100dvh;
+            display: flex; flex-direction: column;
+            background: rgba(15, 23, 42, 0.95); /* Panel semitransparente */
+            backdrop-filter: blur(5px);
+            box-shadow: 0 0 40px rgba(0,0,0,0.8);
+            position: relative;
         }
 
-        /* CABECERA */
+        /* CABECERA (Dimensiones) */
         header {
-            padding: 15px 15px 10px 15px; background: rgba(30, 41, 59, 0.98);
-            border-bottom: 1px solid rgba(255,255,255,0.1); flex-shrink: 0; z-index: 10;
+            padding: 15px 15px 10px 15px;
+            background: rgba(30, 41, 59, 0.9);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            z-index: 10;
         }
-        .header-title { text-align: center; font-size: 11px; font-weight: 700; color: var(--text-muted); letter-spacing: 1px; margin-bottom: 8px; text-transform: uppercase;}
-        .dimension-bars { display: flex; flex-direction: column; gap: 6px; }
+
+        .header-title { text-align: center; font-size: 12px; font-weight: 700; color: var(--text-muted); letter-spacing: 1px; margin-bottom: 10px; text-transform: uppercase;}
+
+        /* BARRAS DE DIMENSIÓN */
+        .dimension-bars { display: flex; flex-direction: column; gap: 8px; }
         .dim-row { display: flex; align-items: center; font-size: 11px; font-weight: 600;}
-        .dim-label { width: 80px; text-align: left; }
-        .bar-bg { flex-grow: 1; height: 8px; background: #0f172a; border-radius: 4px; overflow: hidden; margin: 0 10px; border: 1px solid #334155;}
+        .dim-label { width: 85px; text-align: left; }
+        .bar-bg { flex-grow: 1; height: 10px; background: #0f172a; border-radius: 5px; overflow: hidden; margin: 0 10px; border: 1px solid #334155;}
         .bar-fill { height: 100%; transition: width 0.5s ease, background 0.5s ease; width: 50%; }
+        
         .bar-economy { background: var(--success); }
         .bar-society { background: var(--society); }
         .bar-nature { background: var(--nature); }
 
-        /* ÁREA SCROLLABLE */
-        main { 
-            flex-grow: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
-            padding: 15px; padding-bottom: 100px; display: flex; flex-direction: column; 
+        /* ÁREA DE CONTENIDO */
+        main {
+            flex-grow: 1; overflow-y: auto;
+            padding: 20px; padding-bottom: 120px; 
+            display: flex; flex-direction: column;
         }
 
-        /* ESCENARIO VISUAL */
-        #scene {
-            width: 100%; height: 140px; border-radius: 12px; margin-bottom: 15px;
-            position: relative; overflow: hidden; border: 2px solid #334155;
-            flex-shrink: 0; background: #0f172a; transition: border-color 0.5s;
+        /* ESCENARIO VISUAL (Entorno Interactivo) */
+        #scene-container {
+            width: 100%; height: 140px;
+            border-radius: 15px; margin-bottom: 20px;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 70px; /* Tamaño del emoji del entorno */
+            background: #0f172a;
+            border: 2px dashed #334155;
+            transition: all var(--transition-speed) ease;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
         }
-        .sky { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #38bdf8; transition: background 1s ease; }
-        .sky.polluted { background: #78350f; }
-        .sun { position: absolute; top: 15px; right: 20px; width: 30px; height: 30px; background: #fde047; border-radius: 50%; box-shadow: 0 0 15px #fde047; transition: all 1s; }
-        .sun.polluted { opacity: 0.2; transform: scale(0.8); background: #9ca3af; box-shadow: none;}
-        .factory { position: absolute; bottom: 0; left: 10%; width: 80px; height: 60px; display: flex; align-items: flex-end; }
-        .building { width: 60px; height: 40px; background: #475569; border: 2px solid #334155; position: relative; z-index: 2; }
-        .chimney { position: absolute; bottom: 40px; left: 5px; width: 15px; height: 35px; background: #334155; border: 2px solid #1e293b; z-index: 1; }
-        .chimney-2 { left: 30px; height: 25px; }
-        .smoke { position: absolute; width: 15px; height: 15px; background: #64748b; border-radius: 50%; bottom: 75px; left: 10px; opacity: 0; transition: opacity 1s; animation: floatSmoke 3s infinite linear; }
-        .smoke-2 { left: 35px; bottom: 65px; animation-delay: 1.5s; width: 20px; height: 20px; }
-        .smoke.active { opacity: 0.9; background: #1f2937; }
-        @keyframes floatSmoke { 0% { transform: translateY(0) scale(1); opacity: 0.8; } 100% { transform: translateY(-30px) scale(2); opacity: 0; } }
-        .nature { position: absolute; bottom: 0; right: 5%; width: 100px; height: 50px; z-index: 3; }
-        .tree { position: absolute; bottom: 0; width: 20px; height: 20px; background: #22c55e; border-radius: 50% 50% 0 0; transition: all 1s; }
-        .tree::after { content: ''; position: absolute; bottom: -12px; left: 8px; width: 4px; height: 12px; background: #78350f; }
-        .tree-1 { right: 10px; bottom: 10px; }
-        .tree-2 { right: 30px; bottom: 5px; width: 15px; height: 15px; }
-        .tree.polluted { background: #78350f; transform: scale(0.7); }
-        .river { position: absolute; bottom: 0; right: 0; width: 100%; height: 8px; background: #0284c7; transition: background 1s; }
-        .river.polluted { background: #451a03; }
 
-        /* TARJETA DE DIÁLOGO */
+        #scene-icon { z-index: 2; transition: transform 0.5s ease; }
+
+        /* HISTORIA Y PERSONAJE */
         .character-card {
-            display: flex; align-items: flex-start; background: var(--panel-bg); padding: 15px; border-radius: 12px;
-            margin-bottom: 15px; border-left: 4px solid var(--primary); flex-shrink: 0;
+            display: flex; align-items: flex-start;
+            background: var(--panel-bg); padding: 15px; border-radius: 15px;
+            margin-bottom: 15px; border-left: 4px solid var(--primary);
+            animation: slideIn 0.4s ease forwards;
         }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+
         .avatar {
-            width: 40px; height: 40px; display: flex; justify-content: center; align-items: center;
-            font-size: 22px; margin-right: 12px; flex-shrink: 0; background: #0f172a; border-radius: 50%;
-            border: 2px solid var(--primary);
+            width: 45px; height: 45px; display: flex; justify-content: center; align-items: center;
+            font-size: 24px; margin-right: 15px; flex-shrink: 0; background: #0f172a; border-radius: 50%;
+            border: 2px solid;
         }
+
         .dialogue { flex: 1; }
-        .dialogue strong { display: block; font-size: 13px; margin-bottom: 4px; color: var(--primary);}
-        .dialogue p { text-align: left; font-size: 13px; color: #e2e8f0; line-height: 1.5;}
+        .dialogue strong { display: block; font-size: 14px; margin-bottom: 4px; color: var(--primary);}
+        .dialogue p { text-align: left; font-size: 14px; color: #e2e8f0; line-height: 1.5;}
 
-        .character-card.state-doc { border-left: none; border: 2px solid var(--state-color); background: rgba(139, 92, 246, 0.1); }
-        .character-card.state-doc .avatar { border-color: var(--state-color); }
-        .character-card.state-doc strong { color: var(--state-color); text-transform: uppercase; font-size: 11px; letter-spacing: 1px;}
-        .character-card.state-doc p { font-family: monospace; color: #ddd6fe;}
-
-        /* OPCIONES */
-        .instruction-text { text-align: center; font-size: 11px; color: var(--warning); margin-bottom: 10px; font-weight: 600; display: none; }
-        .options-container { display: flex; flex-direction: column; gap: 10px;}
+        /* OPCIONES (Decisiones) */
+        .options-container { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
+        
         .decision-btn {
-            background: #334155; color: white; border: 2px solid #475569; padding: 14px; border-radius: 10px;
-            font-size: 13px; font-weight: 600; text-align: left; cursor: pointer; transition: all 0.2s ease;
+            background: #334155; color: white; border: 2px solid #475569;
+            padding: 15px; border-radius: 12px; font-size: 14px; font-weight: 600;
+            text-align: left; cursor: pointer; transition: all 0.2s ease;
+            position: relative; overflow: hidden;
         }
+        
         .decision-btn:active { transform: scale(0.98); background: #475569; }
+        .decision-btn:hover { border-color: var(--primary); }
 
-        /* BOTÓN FIJO INFERIOR */
+        /* BOTÓN FIJO PARA AVANZAR */
         footer {
             position: fixed; bottom: 0; left: 0; width: 100%;
-            padding: 15px 15px calc(15px + env(safe-area-inset-bottom)) 15px;
-            background: linear-gradient(to top, #0f172a 90%, transparent); z-index: 100;
+            display: flex; justify-content: center;
+            background: linear-gradient(to top, #0f172a 90%, transparent);
+            z-index: 999; padding-bottom: env(safe-area-inset-bottom);
         }
-        #btn-action {
-            background: var(--primary); color: white; border: none; padding: 16px; font-size: 15px;
-            font-weight: 700; border-radius: 10px; width: 100%; cursor: pointer; 
-            transition: transform 0.1s, background 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-        #btn-action:active { transform: scale(0.96); }
-        #btn-action:disabled { background: #475569; color: #94a3b8; box-shadow: none;}
-
-        /* PANTALLA DE RESULTADOS */
-        #results-screen { display: none; flex-direction: column; animation: slideIn 0.5s ease forwards;}
-        .score-circle {
-            width: 120px; height: 120px; border-radius: 50%; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; margin: 0 auto 15px auto; border: 5px solid var(--primary);
-            background: #0f172a; box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
-        }
-        .score-number { font-size: 32px; font-weight: 700; line-height: 1; color: var(--primary);}
-        .score-text { font-size: 11px; color: var(--text-muted); margin-top: 2px;}
-        .result-title { text-align: center; font-size: 18px; font-weight: 700; margin-bottom: 8px; }
-        .result-desc { text-align: center; font-size: 12px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.4;}
         
-        .final-dims-container { background: var(--panel-bg); border-radius: 12px; padding: 15px; margin-bottom: 20px; border: 1px solid #334155; }
-        .final-dims-title { font-size: 13px; font-weight: 700; text-align: center; margin-bottom: 12px; color: #cbd5e1; text-transform: uppercase;}
-        .final-dim-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; font-size: 12px; font-weight: 600; }
-        .final-dim-label { display: flex; align-items: center; width: 100px; }
-        .final-dim-bar-bg { flex-grow: 1; height: 10px; background: #0f172a; border-radius: 5px; margin: 0 8px; overflow: hidden; border: 1px solid #334155; }
-        .final-dim-bar-fill { height: 100%; border-radius: 5px; }
-        .final-dim-value { width: 35px; text-align: right; font-size: 13px;}
+        #btn-next {
+            background: var(--primary); color: white; border: none; padding: 16px; font-size: 16px;
+            font-weight: 700; border-radius: 12px; width: calc(100% - 30px); max-width: 450px;
+            margin: 15px; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+            display: none; /* Oculto hasta que se tome una decisión */
+        }
+        #btn-next:active { transform: scale(0.96); }
 
-        .history-title { font-size: 14px; font-weight: 700; border-bottom: 2px solid #334155; padding-bottom: 8px; margin-bottom: 12px; color: var(--text-main);}
-        .history-item { background: var(--panel-bg); padding: 12px; border-radius: 8px; margin-bottom: 10px; font-size: 12px; border-left: 4px solid; }
-        .history-item.good { border-color: var(--success); }
-        .history-item.bad { border-color: var(--danger); }
-        .history-header { font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 5px;}
-        .history-header.good { color: var(--success); }
-        .history-header.bad { color: var(--danger); }
-        .history-choice { color: #cbd5e1; font-style: italic; margin-bottom: 4px;}
-        .history-feedback { font-size: 10px; color: var(--text-muted); }
-
-        @keyframes slideIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
     <div id="app">
-        <header id="top-header">
-            <div class="header-title">Dimensiones en Tiempo Real</div>
+        <!-- CABECERA: Dimensiones del Juego -->
+        <header>
+            <div class="header-title">Tus Dimensiones</div>
             <div class="dimension-bars">
-                <div class="dim-row"><div class="dim-label">Economía 💰</div><div class="bar-bg"><div class="bar-fill bar-economy" id="bar-eco"></div></div></div>
-                <div class="dim-row"><div class="dim-label">Sociedad 🏘️</div><div class="bar-bg"><div class="bar-fill bar-society" id="bar-soc"></div></div></div>
-                <div class="dim-row"><div class="dim-label">Naturaleza 🌿</div><div class="bar-bg"><div class="bar-fill bar-nature" id="bar-nat"></div></div></div>
+                <div class="dim-row">
+                    <div class="dim-label">Economía 💰</div>
+                    <div class="bar-bg"><div class="bar-fill bar-economy" id="bar-eco" style="width: 50%;"></div></div>
+                </div>
+                <div class="dim-row">
+                    <div class="dim-label">Sociedad 🏘️</div>
+                    <div class="bar-bg"><div class="bar-fill bar-society" id="bar-soc" style="width: 50%;"></div></div>
+                </div>
+                <div class="dim-row">
+                    <div class="dim-label">Naturaleza 🌿</div>
+                    <div class="bar-bg"><div class="bar-fill bar-nature" id="bar-nat" style="width: 50%;"></div></div>
+                </div>
             </div>
         </header>
 
+        <!-- CONTENIDO PRINCIPAL -->
         <main id="main-content">
-            <div id="game-ui" style="display: flex; flex-direction: column; flex-grow: 1;">
-                
-                <!-- ESCENARIO -->
-                <div id="scene">
-                    <div class="sky" id="sky"></div>
-                    <div class="sun" id="sun"></div>
-                    <div class="river" id="river"></div>
-                    <div class="factory">
-                        <div class="chimney"></div><div class="chimney chimney-2"></div>
-                        <div class="smoke" id="smoke1"></div><div class="smoke smoke-2" id="smoke2"></div>
-                        <div class="building"></div>
-                    </div>
-                    <div class="nature">
-                        <div class="tree tree-1" id="tree1"></div><div class="tree tree-2" id="tree2"></div>
-                    </div>
-                </div>
-
-                <!-- DIÁLOGO -->
-                <div class="character-card" id="character-card">
-                    <div class="avatar" id="char-avatar">👨🏽‍💼</div>
-                    <div class="dialogue">
-                        <strong id="char-name">Sistema</strong>
-                        <p id="story-text">Cargando...</p>
-                    </div>
-                </div>
-
-                <p class="instruction-text" id="instruction-text">👇 Elige una decisión para continuar</p>
-                <div class="options-container" id="options-container"></div>
+            <!-- Escenario Visual (Cambia según la Naturaleza) -->
+            <div id="scene-container">
+                <div id="scene-icon">🌍</div>
             </div>
 
-            <!-- RESULTADOS -->
-            <div id="results-screen">
-                <div class="score-circle">
-                    <div class="score-number" id="score-display">0</div>
-                    <div class="score-text">de 600 pts</div>
+            <!-- Cuadro de Diálogo -->
+            <div class="character-card" id="character-card">
+                <div class="avatar" id="char-avatar">👨🏽‍💼</div>
+                <div class="dialogue">
+                    <strong id="char-name">Sistema</strong>
+                    <p id="story-text">Cargando historia...</p>
                 </div>
-                <h2 class="result-title" id="result-title">Título</h2>
-                <p class="result-desc" id="result-desc">Descripción final...</p>
+            </div>
 
-                <div class="final-dims-container">
-                    <div class="final-dims-title">📊 Reporte de Dimensiones Finales</div>
-                    <div class="final-dim-row">
-                        <div class="final-dim-label">Economía 💰</div>
-                        <div class="final-dim-bar-bg"><div class="final-dim-bar-fill" id="final-bar-eco" style="background: var(--success);"></div></div>
-                        <div class="final-dim-value" id="final-val-eco" style="color: var(--success);">0%</div>
-                    </div>
-                    <div class="final-dim-row">
-                        <div class="final-dim-label">Sociedad 🏘️</div>
-                        <div class="final-dim-bar-bg"><div class="final-dim-bar-fill" id="final-bar-soc" style="background: var(--society);"></div></div>
-                        <div class="final-dim-value" id="final-val-soc" style="color: var(--society);">0%</div>
-                    </div>
-                    <div class="final-dim-row">
-                        <div class="final-dim-label">Naturaleza 🌿</div>
-                        <div class="final-dim-bar-bg"><div class="final-dim-bar-fill" id="final-bar-nat" style="background: var(--nature);"></div></div>
-                        <div class="final-dim-value" id="final-val-nat" style="color: var(--nature);">0%</div>
-                    </div>
-                </div>
-
-                <h3 class="history-title">📋 Historial de Decisiones</h3>
-                <div id="history-container"></div>
+            <!-- Botones de Decisión (Se generan con JS) -->
+            <div class="options-container" id="options-container">
+                <!-- Aquí JavaScript inyecta los botones -->
             </div>
         </main>
 
+        <!-- BOTÓN CONTINUAR -->
         <footer>
-            <button id="btn-action">Aceptar el Reto e Iniciar ➔</button>
+            <button id="btn-next">Continuar ➔</button>
         </footer>
     </div>
 
     <script>
-        // ESTADO GLOBAL
-        let state = { eco: 50, soc: 50, nat: 50, chapter: -1, score: 0, history: [] };
-        let currentPhase = "intro"; 
+        // --- 1. ESTADO DEL JUEGO ---
+        let state = {
+            eco: 50,  // Economía
+            soc: 50,  // Sociedad
+            nat: 50,  // Naturaleza
+            chapter: 0 // Capítulo actual de la historia
+        };
 
+        // --- 2. LA HISTORIA (8 Escenarios Interactivos) ---
+        const storyData = [
+            {
+                title: "Capítulo 1: La Oportunidad",
+                charName: "El Agricultor",
+                avatar: "👨🏽‍🌾",
+                text: "¡Hola, Gerente! La demanda de chocolate está por las nubes. Si procesamos todo el cacao posible, nos haremos ricos. ¿Qué decides?",
+                options: [
+                    { text: "Producir al 100% (Maximizar dinero)", eco: 30, soc: -10, nat: -30, next: 1 },
+                    { text: "Producir moderadamente (Equilibrio)", eco: 10, soc: 0, nat: -10, next: 1 }
+                ]
+            },
+            {
+                title: "Capítulo 2: El Río se Queja",
+                charName: "La Comunidad",
+                avatar: "👨🏽‍👩🏽‍👧🏽",
+                text: "Gerente, el río está lleno de desechos de tu planta. Los niños se están enfermando. ¡Necesitamos que hagas algo!",
+                options: [
+                    { text: "Ignorarlos, mi prioridad es la empresa.", eco: 10, soc: -30, nat: -20, next: 2 },
+                    { text: "Invertir en filtros de agua (Costo alto).", eco: -20, soc: 30, nat: 30, next: 2 }
+                ]
+            },
+            {
+                title: "Capítulo 3: La Llegada del Estado",
+                charName: "El Estado",
+                avatar: "🏛️",
+                text: "Hemos detectado la Externalidad Negativa. Para proteger el río, impondremos un Impuesto Pigouviano de $10 por tonelada de contaminación.",
+                options: [
+                    { text: "Aceptar el impuesto y adaptarse.", eco: -15, soc: 20, nat: 25, next: 3 },
+                    { text: "Evadir impuestos (Corrupción).", eco: 25, soc: -20, nat: -25, next: 3 }
+                ]
+            },
+            {
+                title: "Capítulo 4: Innovación Agroindustrial",
+                charName: "Tu Ingeniero Jefe",
+                avatar: "👷🏽‍♂️",
+                text: "Con el impuesto, nuestra planta necesita cambiar. Podemos implementar un sistema agroforestal o usar químicos baratos.",
+                options: [
+                    { text: "Sistema Agroforestal (Sombra y árboles).", eco: -10, soc: 10, nat: 30, next: 4 },
+                    { text: "Químicos baratos para acelerar producción.", eco: 20, soc: -10, nat: -30, next: 4 }
+                ]
+            },
+            {
+                title: "Capítulo 5: El Sello Orgánico",
+                charName: "El Consumidor",
+                avatar: "🛒",
+                text: "Vi tu producto. Si obtienes la Certificación Orgánica y de Comercio Justo, estoy dispuesto a pagar el doble por tu chocolate.",
+                options: [
+                    { text: "Pagar la certificación y mejorar procesos.", eco: 25, soc: 20, nat: 20, next: 5 },
+                    { text: "Es mucho papeleo, seguiré vendiendo barato.", eco: -10, soc: -5, nat: 0, next: 5 }
+                ]
+            },
+            {
+                title: "Capítulo 6: El Pago por Servicios Ambientales (PSA)",
+                charName: "El Río",
+                avatar: "🌊",
+                text: "El gobierno ofrece un pago si conservas el bosque de ribera que rodea tu planta para proteger el agua.",
+                options: [
+                    { text: "Aceptar el pago y conservar el bosque.", eco: 15, soc: 15, nat: 30, next: 6 },
+                    { text: "Talar el bosque para sembrar más cacao.", eco: 20, soc: -10, nat: -30, next: 6 }
+                ]
+            },
+            {
+                title: "Capítulo 7: Balance Final",
+                charName: "Junta Directiva",
+                avatar: "👔",
+                text: "Gerente, es momento de revisar los resultados. ¿Cómo queda nuestra empresa y nuestro entorno?",
+                options: [
+                    { text: "Ver Resultados Finales", eco: 0, soc: 0, nat: 0, next: 7 }
+                ]
+            }
+        ];
+
+        // --- 3. LÓGICA DE LA INTERFAZ (DOM) ---
         const ui = {
-            charName: document.getElementById('char-name'),
-            charAvatar: document.getElementById('char-avatar'),
-            storyText: document.getElementById('story-text'),
-            optionsContainer: document.getElementById('options-container'),
-            btn: document.getElementById('btn-action'),
-            mainContent: document.getElementById('main-content'),
-            instructionText: document.getElementById('instruction-text'),
-            charCard: document.getElementById('character-card'),
-            
-            // Barras de dimensión
             barEco: document.getElementById('bar-eco'),
             barSoc: document.getElementById('bar-soc'),
             barNat: document.getElementById('bar-nat'),
-            
-            // Escenario
-            sky: document.getElementById('sky'),
-            sun: document.getElementById('sun'),
-            river: document.getElementById('river'),
-            tree1: document.getElementById('tree1'),
-            tree2: document.getElementById('tree2'),
-            smoke1: document.getElementById('smoke1'),
-            smoke2: document.getElementById('smoke2'),
-            
-            // Resultados
-            gameUI: document.getElementById('game-ui'),
-            resultsScreen: document.getElementById('results-screen'),
-            header: document.getElementById('top-header'),
-            scoreDisplay: document.getElementById('score-display'),
-            resultTitle: document.getElementById('result-title'),
-            resultDesc: document.getElementById('result-desc'),
-            historyContainer: document.getElementById('history-container'),
-            finalBarEco: document.getElementById('final-bar-eco'),
-            finalBarSoc: document.getElementById('final-bar-soc'),
-            finalBarNat: document.getElementById('final-bar-nat'),
-            finalValEco: document.getElementById('final-val-eco'),
-            finalValSoc: document.getElementById('final-val-soc'),
-            finalValNat: document.getElementById('final-val-nat')
+            charCard: document.getElementById('character-card'),
+            charAvatar: document.getElementById('char-avatar'),
+            charName: document.getElementById('char-name'),
+            storyText: document.getElementById('story-text'),
+            optionsContainer: document.getElementById('options-container'),
+            btnNext: document.getElementById('btn-next'),
+            mainContent: document.getElementById('main-content'),
+            sceneContainer: document.getElementById('scene-container'),
+            sceneIcon: document.getElementById('scene-icon'),
+            body: document.body
         };
 
-        const storyData = [
-            {
-                charName: "El Agricultor", avatar: "👨🏽‍🌾",
-                text: "¡Hola, Gerente! La demanda de chocolate está por las nubes. Si procesamos todo el cacao posible, nos haremos ricos. ¿Qué decides?",
-                options: [
-                    { text: "Producir al 100% (Maximizar dinero)", eco: 30, soc: -10, nat: -30, next: 1, isGood: false, points: 0, feedback: "Producir sin límites genera una externalidad negativa enorme. El daño social no está siendo pagado." },
-                    { text: "Producir moderadamente (Equilibrio)", eco: 10, soc: 0, nat: -10, next: 1, isGood: true, points: 100, feedback: "Buena elección. Un crecimiento controlado permite evaluar los impactos ambientales a tiempo." }
-                ]
-            },
-            {
-                charName: "La Comunidad", avatar: "👨🏽‍👩🏽‍👧🏽",
-                text: "Gerente, el río está lleno de desechos. Los niños se enferman. ¡Necesitamos que hagas algo!",
-                options: [
-                    { text: "Ignorarlos, mi prioridad es la empresa.", eco: 10, soc: -30, nat: -20, next: 2, isGood: false, points: 0, feedback: "Ignorar a la comunidad destruye la dimensión social." },
-                    { text: "Invertir en filtros de agua (Costo alto).", eco: -20, soc: 30, nat: 30, next: 2, isGood: true, points: 100, feedback: "Invertir en mitigación reduce el costo social y protege el entorno." }
-                ]
-            },
-            {
-                charName: "Ministerio de Ambiente", avatar: "🏛️", isState: true,
-                text: "RESOLUCIÓN N° 402.\nEstimado Gerente. Su nivel de Naturaleza está en [NAT]%. Se impone un Impuesto Pigouviano sobre el daño marginal. ¿Acepta la regulación?",
-                options: [
-                    { text: "Aceptar el impuesto y adaptar la planta.", eco: -15, soc: 20, nat: 25, next: 3, isGood: true, points: 100, feedback: "Aceptar el impuesto internaliza la externalidad." },
-                    { text: "Evadir impuestos (Buscar sobornos).", eco: 25, soc: -20, nat: -25, next: 3, isGood: false, points: 0, feedback: "La corrupción destruye la sociedad y el ambiente." }
-                ]
-            },
-            {
-                charName: "Ingeniero Jefe", avatar: "👷🏽‍♂️",
-                text: "Jefe, con el impuesto encima, necesitamos cambiar. Podemos implementar un sistema agroforestal o usar químicos baratos.",
-                options: [
-                    { text: "Sistema Agroforestal.", eco: -10, soc: 10, nat: 30, next: 4, isGood: true, points: 100, feedback: "El sistema agroforestal protege el suelo y la biodiversidad." },
-                    { text: "Químicos baratos.", eco: 20, soc: -10, nat: -30, next: 4, isGood: false, points: 0, feedback: "Los químicos degradan la naturaleza." }
-                ]
-            },
-            {
-                charName: "El Consumidor", avatar: "🛒",
-                text: "Gerente, si obtiene la Certificación Orgánica, pagaré el doble por su chocolate.",
-                options: [
-                    { text: "Pagar la certificación.", eco: 25, soc: 20, nat: 20, next: 5, isGood: true, points: 100, feedback: "La certificación premia la calidad y la sostenibilidad." },
-                    { text: "Mucho papeleo, venderé barato.", eco: -10, soc: -5, nat: 0, next: 5, isGood: false, points: 0, 
+        // --- 4. ACTUALIZAR ENTORNO VISUAL ---
+        function updateEnvironment() {
+            // Lógica de colores y emojis basados en la Naturaleza
+            if (state.nat >= 70) {
+                // Entorno Saludable
+                ui.body.style.backgroundColor = "#064e3b"; // Verde oscuro
+                ui.sceneContainer.style.background = "linear-gradient(180deg, #065f46, #022c22)";
+                ui.sceneContainer.style.borderColor = "#10b981";
+                ui.sceneIcon.innerText = "🌳";
+                ui.sceneIcon.style.transform = "scale(1.2)";
+            } else if (state.nat >= 40) {
+                // Entorno Neutro
+                ui.body.style.backgroundColor = "#0f172a"; // Azul oscuro original
+                ui.sceneContainer.style.background = "#0f172a";
+                ui.sceneContainer.style.borderColor = "#334155";
+                ui.sceneIcon.innerText = "🏞️";
+                ui.sceneIcon.style.transform = "scale(1)";
+            } else {
+                // Entorno Contaminado
+                ui.body.style.backgroundColor = "#450a0a"; // Rojo oscuro
+                ui.sceneContainer.style.background = "linear-gradient(180deg, #7f1d1d, #450a0a)";
+                ui.sceneContainer.style.borderColor = "#ef4444";
+                ui.sceneIcon.innerText = "🏭";
+                ui.sceneIcon.style.transform = "scale(1.2)";
+            }
+        }
+
+        // --- 5. ACTUALIZAR BARRAS ---
+        function updateBars() {
+            // Asegurar que no bajen de 0 ni suban de 100
+            state.eco = Math.max(0, Math.min(100, state.eco));
+            state.soc = Math.max(0, Math.min(100, state.soc));
+            state.nat = Math.max(0, Math.min(100, state.nat));
+
+            ui.barEco.style.width = state.eco + '%';
+            ui.barSoc.style.width = state.soc + '%';
+            ui.barNat.style.width = state.nat + '%';
+
+            // Cambiar color si está crítico
+            ui.barEco.style.background = state.eco < 30 ? '#ef4444' : '#10b981';
+            ui.barSoc.style.background = state.soc < 30 ? '#ef4444' : '#f97316';
+            ui.barNat.style.background = state.nat < 30 ? '#ef4444' : '#06b6d4';
+            
+            updateEnvironment();
+        }
+
+        // --- 6. RENDERIZAR CAPÍTULO ---
+        function renderChapter() {
+            const data = storyData[state.chapter];
+            
+            // Actualizar textos
+            ui.charName.innerText = data.charName;
+            ui.charAvatar.innerText = data.avatar;
+            ui.storyText.innerText = data.text;
+            
+            // Animación de entrada de la tarjeta
+            ui.charCard.style.animation = 'none';
+            ui.charCard.offsetHeight; /* trigger reflow */
+            ui.charCard.style.animation = 'slideIn 0.4s ease forwards';
+
+            // Limpiar botones anteriores
+            ui.optionsContainer.innerHTML = '';
+            ui.btnNext.style.display = 'none';
+
+            // Generar nuevos botones
+            data.options.forEach(option => {
+                const btn = document.createElement('button');
+                btn.className = 'decision-btn';
+                btn.innerText = option.text;
+                btn.onclick = () => makeDecision(option);
+                ui.optionsContainer.appendChild(btn);
+            });
+
+            // Scroll al inicio
+            ui.mainContent.scrollTop = 0;
+        }
+
+        // --- 7. TOMAR DECISIÓN ---
+        function makeDecision(option) {
+            // Aplicar efectos a las dimensiones
+            state.eco += option.eco;
+            state.soc += option.soc;
+            state.nat += option.nat;
+
+            // Actualizar UI
+            updateBars();
+
+            // Deshabilitar botones para que no hagan doble clic
+            const btns = ui.optionsContainer.querySelectorAll('.decision-btn');
+            btns.forEach(b => b.style.pointerEvents = 'none');
+
+            // Mostrar el botón de "Continuar" fijo abajo
+            ui.btnNext.style.display = 'block';
+            
+            // Configurar qué hará el botón continuar
+            ui.btnNext.onclick = () => {
+                state.chapter = option.next;
+                if (state.chapter >= storyData.length) {
+                    showEndGame();
+                } else {
+                    renderChapter();
+                }
+            };
+        }
+
+        // --- 8. PANTALLA FINAL ---
+        function showEndGame() {
+            // Ocultar botón fijo
+            ui.btnNext.style.display = 'none';
+            
+            let finalMessage = "";
+            let title = "";
+            
+            if (state.eco > 60 && state.nat > 60 && state.soc > 60) {
+                title = "🏆 ¡Desarrollo Sostenible!";
+                finalMessage = "Lograste un equilibrio perfecto. Tu empresa es rentable, la comunidad te apoya y el río está limpio. ¡Eres un Ingeniero Agroindustrial ejemplar!";
+            } else if (state.eco > 70 && state.nat < 40) {
+                title = "💸 Rico, pero Destructivo";
+                finalMessage = "Ganaste mucho dinero, pero destruiste el río y la comunidad te odia. El Estado probablemente te clausure pronto. El Impuesto Pigouviano existe para evitar esto.";
+            } else if (state.nat > 70 && state.eco < 40) {
+                title = "🌿 Héroe Ecológico en Banca Rota";
+                finalMessage = "El río está hermoso, pero tu empresa está en quiebra. Recuerda que la economía también importa para el bienestar social.";
+            } else {
+                title = "⚖️ Supervivencia";
+                finalMessage = "No tomaste las mejores decisiones, pero lograste mantener la empresa a flote. Podrías haber maximizado el bienestar social.";
+            }
+
+            // Modificar la interfaz para mostrar el final
+            document.querySelector('header').style.display = 'none'; // Ocultar barras
+            ui.storyText.innerText = finalMessage;
+            ui.charName.innerText = title;
+            ui.charAvatar.innerText = "📊";
+            
+            // Botón de reiniciar
+            ui.btnNext.innerText = "Jugar de Nuevo 🔄";
+            ui.btnNext.style.display = 'block';
+            ui.btnNext.onclick = () => location.reload();
+            
+            // Actualizar el escenario según el final
+            updateEnvironment();
+            ui.sceneIcon.innerText = "🌍";
+        }
+
+        // --- INICIALIZAR JUEGO ---
+        window.onload = () => {
+            updateBars();
+            renderChapter();
+        };
+
+    </script>
+</body>
+</html>
