@@ -18,30 +18,44 @@
             --warning: #f59e0b;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent;}
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Poppins', sans-serif; 
+            -webkit-tap-highlight-color: transparent; /* Quita el recuadro azul al tocar en celular */
+        }
+
+        html, body {
+            height: 100%; /* Necesario para el cálculo de altura */
+        }
 
         body {
             background-color: var(--bg-color);
             color: var(--text-main);
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* Permite scroll si el contenido es muy largo */
-            min-height: 100vh;
+            align-items: center; /* Centra la tarjeta en la pantalla */
+            min-height: 100dvh; /* Dynamic Viewport Height: Soluciona el problema de las barras del navegador */
             padding: 10px;
+            overflow: hidden; /* Evita scroll en el body, el scroll será interno */
         }
 
         /* Contenedor Principal (Diseño de App Móvil) */
         #app-container {
             width: 100%;
-            max-width: 480px; /* Ancho máximo ideal para celular */
+            max-width: 480px; 
             background: var(--card-bg);
             border-radius: 20px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-            padding: 25px 15px 20px 15px; /* Más padding arriba para el reloj */
+            padding: 25px 15px 20px 15px;
+            padding-bottom: calc(20px + env(safe-area-inset-bottom)); /* Protege el botón de la barra de gestos */
             position: relative;
-            min-height: 85vh;
+            height: 100%; /* Ocupa todo el alto disponible */
+            max-height: 850px; /* Límite para pantallas de PC */
             display: flex;
             flex-direction: column;
+            overflow-y: auto; /* Permite scroll interno si el contenido es muy largo */
         }
 
         /* Barra de Progreso */
@@ -52,6 +66,7 @@
             border-radius: 3px;
             margin-bottom: 20px;
             overflow: hidden;
+            flex-shrink: 0; /* Evita que la barra se aplaste */
         }
         .progress-bar {
             height: 100%;
@@ -60,7 +75,7 @@
             transition: width 0.4s ease;
         }
 
-        /* Pantallas (Ocultas por defecto) */
+        /* Pantallas */
         .screen {
             display: none;
             animation: fadeIn 0.4s ease forwards;
@@ -74,9 +89,9 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Tipografía Móvil */
-        h1 { font-size: 22px; margin-bottom: 12px; color: var(--primary); text-align: center; line-height: 1.2;}
-        h2 { font-size: 18px; margin-bottom: 10px; text-align: center;}
+        /* Tipografía */
+        h1 { font-size: 22px; margin-bottom: 12px; color: var(--primary); text-align: center; line-height: 1.2; flex-shrink: 0;}
+        h2 { font-size: 18px; margin-bottom: 10px; text-align: center; flex-shrink: 0;}
         p { font-size: 14px; color: var(--text-muted); line-height: 1.5; margin-bottom: 15px; text-align: center;}
         
         /* Personajes */
@@ -88,6 +103,7 @@
             border-radius: 12px;
             margin-bottom: 15px;
             border-left: 4px solid var(--primary);
+            flex-shrink: 0;
         }
         .character-icon {
             font-size: 28px;
@@ -97,7 +113,7 @@
         .character-text { font-size: 13px; color: var(--text-muted); line-height: 1.4;}
         .character-text strong { color: #fff; display: block; margin-bottom: 4px; font-size: 14px;}
 
-        /* Botones Táctiles */
+        /* Botones */
         button {
             background: var(--primary);
             color: white;
@@ -109,14 +125,15 @@
             cursor: pointer;
             transition: all 0.2s ease;
             width: 100%;
-            margin-top: auto;
+            margin-top: auto; /* Empuja el botón hacia abajo */
             box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
+            flex-shrink: 0;
         }
-        button:active { transform: scale(0.97); } /* Efecto al presionar en celular */
+        button:active { transform: scale(0.97); }
         button:disabled { background: #475569; box-shadow: none; cursor: not-allowed; transform: none; }
 
         /* Juego: Sliders y Estadísticas */
-        .game-area { background: #0f172a; padding: 15px; border-radius: 16px; margin-bottom: 15px;}
+        .game-area { background: #0f172a; padding: 15px; border-radius: 16px; margin-bottom: 15px; flex-shrink: 0;}
         
         .slider-container { margin: 10px 0 20px 0; text-align: center; }
         input[type=range] {
@@ -128,7 +145,6 @@
             -webkit-appearance: none;
             margin-top: 10px;
         }
-        /* Pulgar grande para dedos */
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
             width: 32px;
@@ -139,13 +155,8 @@
             box-shadow: 0 0 10px rgba(59, 130, 246, 0.6);
         }
 
-        /* Grid de estadísticas adaptable */
-        .stats-grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; /* 2 columnas en móvil */
-            gap: 10px; 
-        }
-        .stats-grid.three-cols { grid-template-columns: 1fr; } /* 3 métricas se apilan en móvil */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .stats-grid.three-cols { grid-template-columns: 1fr; } 
         
         .stat-card {
             background: var(--card-bg);
@@ -193,7 +204,7 @@
         .alert.danger { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid var(--danger); display: block;}
         .alert.success { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid var(--success); display: block;}
 
-        /* Preguntas Finales */
+        /* Preguntas */
         .question-box { margin-bottom: 12px; background: #0f172a; padding: 12px; border-radius: 10px;}
         .question-box p { text-align: left; font-size: 13px; color: #fff; margin-bottom: 10px;}
         .options { display: flex; flex-direction: column; gap: 8px;}
@@ -304,7 +315,6 @@
                     <input type="range" id="slider2" min="0" max="20" value="10" step="1">
                 </div>
                 
-                <!-- En móvil, las 3 métricas se ponen en una columna para que se lean bien -->
                 <div class="stats-grid three-cols">
                     <div class="stat-card tax">
                         <div class="stat-label">Impuesto Pagado</div>
@@ -381,7 +391,6 @@
         let timerInterval;
         let timeLeft = 30;
 
-        // Constantes del juego
         const marginalProfit = 15; 
         const marginalDamage = 10; 
         const taxRate = 10; 
@@ -392,7 +401,6 @@
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            // Hacer scroll al inicio de la pantalla en móviles
             window.scrollTo(0,0); 
         }
 
@@ -400,7 +408,6 @@
             progressBar.style.width = percent + '%';
         }
 
-        // Manejo del tiempo
         function startTimer(onEnd) {
             timeLeft = 30;
             timerDisplay.style.display = 'block';
@@ -430,7 +437,6 @@
             timerDisplay.style.display = 'none';
         }
 
-        // Flujo
         function startConcept() {
             updateProgress(16);
             showScreen('screen-concept');
@@ -480,12 +486,4 @@
             const slider = document.getElementById('slider2');
             const label = document.getElementById('prod-label2');
             const taxEl = document.getElementById('tax2');
-            const netEl = document.getElementById('net2');
-            const alertEl = document.getElementById('alert2');
-
-            startTimer(() => {
-                startQuiz();
-            });
-
-            slider.addEventListener('input', () => {
-                let prod = parseInt(slider.v
+         
