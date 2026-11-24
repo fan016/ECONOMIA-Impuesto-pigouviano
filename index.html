@@ -189,9 +189,10 @@
         #btn-action {
             background: var(--primary); color: white; border: none; padding: 16px; font-size: 16px;
             font-weight: 700; border-radius: 12px; width: 100%;
-            cursor: pointer; transition: transform 0.1s;
+            cursor: pointer; transition: transform 0.1s, background 0.2s;
         }
         #btn-action:active { transform: scale(0.96); }
+        #btn-action:disabled { background: #475569; color: #94a3b8; }
 
         @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -227,7 +228,7 @@
                 
                 <div class="input-group">
                     <label>Ingresa tu nombre de Gerente:</label>
-                    <input type="text" id="input-name" placeholder="Ej. Francisco" maxlength="15">
+                    <input type="text" id="input-name" placeholder="Ej. Francisco" maxlength="15" autocomplete="off" autocapitalize="words">
                 </div>
             </div>
 
@@ -295,6 +296,10 @@
     <script>
         let playerName = "Gerente";
         let state = { eco: 50, soc: 50, nat: 50, chapter: 0, score: 0, history: [] };
+        
+        // Variable de control para saber qué debe hacer el botón principal
+        let currentPhase = "intro"; 
+        let nextChapterIndex = 1;
 
         const ui = {
             header: document.getElementById('top-header'),
@@ -368,7 +373,4 @@
                     { text: "Pagar la certificación.", eco: 25, soc: 20, nat: 20, next: 5, isGood: true, points: 100, feedback: "La certificación es una herramienta de mercado que premia la calidad y la sostenibilidad." },
                     { text: "Mucho papeleo, venderé barato.", eco: -10, soc: -5, nat: 0, next: 5, isGood: false, points: 0, feedback: "Renunciar a la certificación te hace competir en desventaja sin aprovechar mercados diferenciados." }
                 ]
-            },
-            {
-                charName: "Autoridad Ambiental", avatar: "🏛️", isState: true,
-                text: "NOTIFICACIÓN: Gerente [NAME], el gobierno ofrece un Pago por Servicios Ambientales (PSA) si conserva el bosque de ribera. Si no lo hace, se duplicará su tasa
+   
