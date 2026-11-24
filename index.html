@@ -1,14 +1,15 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EcoSim: El Dilema del Cacao</title>
+    <title>EcoSim: La Ruta del Cacao</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-dark: #0f172a;
-            --panel-bg: rgba(30, 41, 59, 0.95);
+            --panel-bg: #1e293b;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --primary: #3b82f6;
@@ -17,373 +18,426 @@
             --warning: #f59e0b;
             --nature: #06b6d4;
             --society: #f97316;
+            --transition-speed: 0.8s;
         }
 
         * { 
-            box-sizing: border-box; 
-            margin: 0; 
-            padding: 0; 
-            font-family: 'Poppins', sans-serif; 
-            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box; margin: 0; padding: 0; 
+            font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent;
         }
 
         body {
+            /* El fondo cambiará con JS dependiendo de la naturaleza */
             background-color: var(--bg-dark);
-            background-image: radial-gradient(circle at top right, #1e1b4b, #0f172a);
             color: var(--text-main);
-            display: flex;
-            justify-content: center;
-            height: 100dvh;
-            overflow: hidden; 
+            display: flex; justify-content: center;
+            height: 100dvh; overflow: hidden; 
+            transition: background-color var(--transition-speed) ease;
         }
 
         #app {
-            width: 100%;
-            max-width: 480px;
-            height: 100dvh;
-            display: flex;
-            flex-direction: column;
-            background: var(--panel-bg);
-            box-shadow: 0 0 40px rgba(0,0,0,0.5);
+            width: 100%; max-width: 480px; height: 100dvh;
+            display: flex; flex-direction: column;
+            background: rgba(15, 23, 42, 0.95); /* Panel semitransparente */
+            backdrop-filter: blur(5px);
+            box-shadow: 0 0 40px rgba(0,0,0,0.8);
             position: relative;
         }
 
-        /* CABECERA */
+        /* CABECERA (Dimensiones) */
         header {
-            padding: 15px 20px 10px 20px;
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(10px);
+            padding: 15px 15px 10px 15px;
+            background: rgba(30, 41, 59, 0.9);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
             z-index: 10;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .logo { font-size: 14px; font-weight: 700; color: var(--primary); letter-spacing: 1px;}
-        #timer { background: var(--warning); color: #000; padding: 4px 12px; border-radius: 20px; font-size: 14px; font-weight: 700; display: none; box-shadow: 0 0 10px rgba(245, 158, 11, 0.4); }
-        
-        .progress-bg { width: 100%; height: 6px; background: #334155; border-radius: 3px; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.4s ease; }
-
-        /* ÁREA SCROLLABLE */
-        main {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 20px;
-            padding-bottom: 120px; /* Espacio crucial para que el texto no quede tapado por el botón fijo */
-            scroll-behavior: smooth;
-        }
-
-        .screen { display: none; animation: fadeIn 0.4s ease forwards; }
-        .screen.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-
-        h1 { font-size: 22px; text-align: center; margin-bottom: 10px; color: #fff;}
-        h2 { font-size: 18px; text-align: center; margin-bottom: 15px; color: var(--primary);}
-        p { font-size: 14px; color: var(--text-muted); text-align: center; margin-bottom: 20px; line-height: 1.5;}
-
-        /* PERSONAJES GEOMÉTRICOS */
-        .character-card {
-            display: flex;
-            align-items: center;
-            background: #1e293b;
-            padding: 15px;
-            border-radius: 15px;
-            margin-bottom: 15px;
-            border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-        }
-
-        .avatar {
-            width: 50px; height: 50px; display: flex; justify-content: center; align-items: center;
-            font-size: 24px; margin-right: 15px; flex-shrink: 0; background: #0f172a; border: 2px solid;
-        }
-        
-        .shape-circle { border-radius: 50%; border-color: var(--primary); box-shadow: 0 0 10px rgba(59,130,246,0.3); }
-        .shape-hex { clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); border-radius: 0; border: none; outline: 2px solid var(--success); outline-offset: -2px;}
-        .shape-triangle { clip-path: polygon(50% 0%, 0% 100%, 100% 100%); border-radius: 0; border: none; outline: 2px solid var(--danger); outline-offset: -2px; padding-top: 10px;}
-        .shape-square { border-radius: 10px; border-color: var(--warning); }
-        .shape-diamond { clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); border-radius: 0; border: none; outline: 2px solid var(--nature); outline-offset: -2px;}
-
-        .dialogue { flex: 1; }
-        .dialogue strong { display: block; font-size: 14px; margin-bottom: 4px; }
-        .dialogue p { text-align: left; margin: 0; font-size: 13px; color: #cbd5e1; line-height: 1.4;}
-
-        .c-blue strong { color: var(--primary); }
-        .c-green strong { color: var(--success); }
-        .c-red strong { color: var(--danger); }
-        .c-yellow strong { color: var(--warning); }
-        .c-cyan strong { color: var(--nature); }
-
-        /* PANEL DE JUEGO */
-        .game-panel { background: #0f172a; padding: 15px; border-radius: 16px; border: 1px solid #334155; margin-bottom: 20px;}
-
-        .slider-box { text-align: center; margin-bottom: 15px; }
-        .slider-box h3 { font-size: 24px; margin-bottom: 10px; color: #fff; }
-        
-        input[type=range] { -webkit-appearance: none; width: 100%; height: 14px; background: #334155; border-radius: 7px; outline: none; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 32px; height: 32px; border-radius: 50%; background: var(--primary); cursor: pointer; box-shadow: 0 0 15px rgba(59, 130, 246, 0.8); border: 3px solid #fff; }
+        .header-title { text-align: center; font-size: 12px; font-weight: 700; color: var(--text-muted); letter-spacing: 1px; margin-bottom: 10px; text-transform: uppercase;}
 
         /* BARRAS DE DIMENSIÓN */
-        .dimension-bars { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
-        .dim-row { display: flex; align-items: center; font-size: 12px; font-weight: 600;}
-        .dim-label { width: 90px; text-align: left; }
-        .bar-bg { flex-grow: 1; height: 12px; background: #1e293b; border-radius: 6px; overflow: hidden; margin: 0 10px; }
-        .bar-fill { height: 100%; transition: width 0.3s ease, background 0.3s ease; width: 50%; }
+        .dimension-bars { display: flex; flex-direction: column; gap: 8px; }
+        .dim-row { display: flex; align-items: center; font-size: 11px; font-weight: 600;}
+        .dim-label { width: 85px; text-align: left; }
+        .bar-bg { flex-grow: 1; height: 10px; background: #0f172a; border-radius: 5px; overflow: hidden; margin: 0 10px; border: 1px solid #334155;}
+        .bar-fill { height: 100%; transition: width 0.5s ease, background 0.5s ease; width: 50%; }
         
         .bar-economy { background: var(--success); }
         .bar-society { background: var(--society); }
         .bar-nature { background: var(--nature); }
 
-        .stats-row { display: flex; justify-content: space-between; gap: 10px; margin-top: 15px;}
-        .stat-box { flex: 1; background: #1e293b; padding: 10px; border-radius: 8px; text-align: center; border-bottom: 3px solid; }
-        .stat-box span { display: block; font-size: 10px; color: var(--text-muted); margin-bottom: 3px;}
-        .stat-box strong { font-size: 16px; }
-        .s-yellow { border-color: var(--warning); color: var(--warning); }
-        .s-blue { border-color: var(--primary); color: var(--primary); }
+        /* ÁREA DE CONTENIDO */
+        main {
+            flex-grow: 1; overflow-y: auto;
+            padding: 20px; padding-bottom: 120px; 
+            display: flex; flex-direction: column;
+        }
 
-        /* PREGUNTAS */
-        .question-block { margin-bottom: 20px; background: #1e293b; padding: 15px; border-radius: 12px;}
-        .question-block p { text-align: left; color: #fff; font-weight: 600; margin-bottom: 12px; font-size: 13px;}
-        .opt-btn { background: #334155; color: #fff; border: 1px solid #475569; padding: 12px; border-radius: 8px; width: 100%; text-align: left; margin-bottom: 8px; font-size: 13px; cursor: pointer; transition: all 0.2s;}
-        .opt-btn.correct { background: var(--success); border-color: var(--success); }
-        .opt-btn.wrong { background: var(--danger); border-color: var(--danger); }
+        /* ESCENARIO VISUAL (Entorno Interactivo) */
+        #scene-container {
+            width: 100%; height: 140px;
+            border-radius: 15px; margin-bottom: 20px;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 70px; /* Tamaño del emoji del entorno */
+            background: #0f172a;
+            border: 2px dashed #334155;
+            transition: all var(--transition-speed) ease;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+        }
 
-        /* BOTÓN FIJO (LA SOLUCIÓN) */
-        footer {
-            position: fixed; /* Fijo a la pantalla, no se mueve al hacer scroll */
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            display: flex;
-            justify-content: center; /* Centra el botón en pantallas grandes */
-            background: linear-gradient(to top, #0f172a 80%, transparent);
-            z-index: 999; /* Asegura que esté por encima de todo */
-            padding-bottom: env(safe-area-inset-bottom); /* Protege del borde inferior del celular */
+        #scene-icon { z-index: 2; transition: transform 0.5s ease; }
+
+        /* HISTORIA Y PERSONAJE */
+        .character-card {
+            display: flex; align-items: flex-start;
+            background: var(--panel-bg); padding: 15px; border-radius: 15px;
+            margin-bottom: 15px; border-left: 4px solid var(--primary);
+            animation: slideIn 0.4s ease forwards;
+        }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+
+        .avatar {
+            width: 45px; height: 45px; display: flex; justify-content: center; align-items: center;
+            font-size: 24px; margin-right: 15px; flex-shrink: 0; background: #0f172a; border-radius: 50%;
+            border: 2px solid;
+        }
+
+        .dialogue { flex: 1; }
+        .dialogue strong { display: block; font-size: 14px; margin-bottom: 4px; color: var(--primary);}
+        .dialogue p { text-align: left; font-size: 14px; color: #e2e8f0; line-height: 1.5;}
+
+        /* OPCIONES (Decisiones) */
+        .options-container { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
+        
+        .decision-btn {
+            background: #334155; color: white; border: 2px solid #475569;
+            padding: 15px; border-radius: 12px; font-size: 14px; font-weight: 600;
+            text-align: left; cursor: pointer; transition: all 0.2s ease;
+            position: relative; overflow: hidden;
         }
         
-        #btn-action {
-            background: var(--primary); color: white; border: none; padding: 16px; font-size: 16px;
-            font-weight: 700; border-radius: 12px; width: calc(100% - 40px); max-width: 440px;
-            margin: 15px 20px; cursor: pointer;
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); transition: transform 0.1s;
-            display: none;
+        .decision-btn:active { transform: scale(0.98); background: #475569; }
+        .decision-btn:hover { border-color: var(--primary); }
+
+        /* BOTÓN FIJO PARA AVANZAR */
+        footer {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            display: flex; justify-content: center;
+            background: linear-gradient(to top, #0f172a 90%, transparent);
+            z-index: 999; padding-bottom: env(safe-area-inset-bottom);
         }
-        #btn-action:active { transform: scale(0.96); }
-        #btn-action:disabled { background: #475569; box-shadow: none; color: #94a3b8;}
+        
+        #btn-next {
+            background: var(--primary); color: white; border: none; padding: 16px; font-size: 16px;
+            font-weight: 700; border-radius: 12px; width: calc(100% - 30px); max-width: 450px;
+            margin: 15px; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+            display: none; /* Oculto hasta que se tome una decisión */
+        }
+        #btn-next:active { transform: scale(0.96); }
+
     </style>
 </head>
 <body>
 
     <div id="app">
+        <!-- CABECERA: Dimensiones del Juego -->
         <header>
-            <div class="header-top">
-                <div class="logo">🌱 ECOSIM</div>
-                <div id="timer">⏱️ 30s</div>
+            <div class="header-title">Tus Dimensiones</div>
+            <div class="dimension-bars">
+                <div class="dim-row">
+                    <div class="dim-label">Economía 💰</div>
+                    <div class="bar-bg"><div class="bar-fill bar-economy" id="bar-eco" style="width: 50%;"></div></div>
+                </div>
+                <div class="dim-row">
+                    <div class="dim-label">Sociedad 🏘️</div>
+                    <div class="bar-bg"><div class="bar-fill bar-society" id="bar-soc" style="width: 50%;"></div></div>
+                </div>
+                <div class="dim-row">
+                    <div class="dim-label">Naturaleza 🌿</div>
+                    <div class="bar-bg"><div class="bar-fill bar-nature" id="bar-nat" style="width: 50%;"></div></div>
+                </div>
             </div>
-            <div class="progress-bg"><div class="progress-fill" id="progress"></div></div>
         </header>
 
+        <!-- CONTENIDO PRINCIPAL -->
         <main id="main-content">
-            <!-- PANTALLA 1 -->
-            <div id="p1" class="screen active">
-                <h1>Los 5 Actores</h1>
-                <p>Conoce a los involucrados en la planta de cacao.</p>
-                
-                <div class="character-card c-green">
-                    <div class="avatar shape-hex">👨🏽‍🌾</div>
-                    <div class="dialogue"><strong>El Agricultor</strong><p>Vende el cacao. Quiere que la planta compre mucho para ganar dinero.</p></div>
-                </div>
-                <div class="character-card c-blue">
-                    <div class="avatar shape-square">👨🏽‍💼</div>
-                    <div class="dialogue"><strong>El Gerente (Tú)</strong><p>Dirige la planta. Su meta es maximizar los beneficios económicos de la empresa.</p></div>
-                </div>
-                <div class="character-card c-cyan">
-                    <div class="avatar shape-diamond">🌊</div>
-                    <div class="dialogue"><strong>La Naturaleza</strong><p>El río recibe los desechos. No puede hablar, pero su salud se deteriora.</p></div>
-                </div>
-                <div class="character-card c-red">
-                    <div class="avatar shape-triangle">👨🏽‍👩🏽‍👧🏽</div>
-                    <div class="dialogue"><strong>La Comunidad</strong><p>Vive aguas abajo. Sufre las enfermedades por el agua contaminada.</p></div>
-                </div>
-                <div class="character-card c-yellow">
-                    <div class="avatar shape-circle">🏛️</div>
-                    <div class="dialogue"><strong>El Estado</strong><p>Busca el equilibrio. Quiere que haya economía, pero sin destruir la sociedad ni el ambiente.</p></div>
+            <!-- Escenario Visual (Cambia según la Naturaleza) -->
+            <div id="scene-container">
+                <div id="scene-icon">🌍</div>
+            </div>
+
+            <!-- Cuadro de Diálogo -->
+            <div class="character-card" id="character-card">
+                <div class="avatar" id="char-avatar">👨🏽‍💼</div>
+                <div class="dialogue">
+                    <strong id="char-name">Sistema</strong>
+                    <p id="story-text">Cargando historia...</p>
                 </div>
             </div>
 
-            <!-- PANTALLA 2 -->
-            <div id="p2" class="screen">
-                <h2>El Conflicto de Dimensiones</h2>
-                <div class="character-card c-blue">
-                    <div class="avatar shape-square">👨🏽‍💼</div>
-                    <div class="dialogue"><strong>Tú (Gerente)</strong><p>Si produzco al máximo, mi dimensión <b>Económica</b> sube, pero las dimensiones <b>Social</b> y <b>Ambiental</b> se destruyen.</p></div>
-                </div>
-                <div class="character-card c-yellow">
-                    <div class="avatar shape-circle">🏛️</div>
-                    <div class="dialogue"><strong>El Estado</strong><p>Exacto. Eso es una "Externalidad Negativa". Para equilibrar las dimensiones, aplicaré un <b>Impuesto Pigouviano</b> de $10 por tonelada de contaminación.</p></div>
-                </div>
-            </div>
-
-            <!-- PANTALLA 3 -->
-            <div id="p3" class="screen">
-                <h2>Fase 1: Libre Mercado</h2>
-                <p>Desliza para ver cómo tu decisión afecta las 3 dimensiones.</p>
-                
-                <div class="game-panel">
-                    <div class="slider-box">
-                        <h3 id="lbl-prod1">10 Toneladas</h3>
-                        <input type="range" id="slider1" min="0" max="20" value="10" step="1">
-                    </div>
-
-                    <div class="dimension-bars">
-                        <div class="dim-row">
-                            <div class="dim-label">Economía 📈</div>
-                            <div class="bar-bg"><div class="bar-fill bar-economy" id="bar-eco1"></div></div>
-                        </div>
-                        <div class="dim-row">
-                            <div class="dim-label">Sociedad 🏘️</div>
-                            <div class="bar-bg"><div class="bar-fill bar-society" id="bar-soc1"></div></div>
-                        </div>
-                        <div class="dim-row">
-                            <div class="dim-label">Naturaleza 🌿</div>
-                            <div class="bar-bg"><div class="bar-fill bar-nature" id="bar-nat1"></div></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PANTALLA 4 -->
-            <div id="p4" class="screen">
-                <h2>Fase 2: El Impuesto</h2>
-                <p>Impuesto de <b>$10/ton</b>. Observa cómo la Economía ya no puede crecer sin límite.</p>
-                
-                <div class="game-panel">
-                    <div class="slider-box">
-                        <h3 id="lbl-prod2">10 Toneladas</h3>
-                        <input type="range" id="slider2" min="0" max="20" value="10" step="1">
-                    </div>
-
-                    <div class="dimension-bars">
-                        <div class="dim-row">
-                            <div class="dim-label">Economía 💰</div>
-                            <div class="bar-bg"><div class="bar-fill bar-economy" id="bar-eco2"></div></div>
-                        </div>
-                        <div class="dim-row">
-                            <div class="dim-label">Sociedad 🏘️</div>
-                            <div class="bar-bg"><div class="bar-fill bar-society" id="bar-soc2"></div></div>
-                        </div>
-                        <div class="dim-row">
-                            <div class="dim-label">Naturaleza 🌿</div>
-                            <div class="bar-bg"><div class="bar-fill bar-nature" id="bar-nat2"></div></div>
-                        </div>
-                    </div>
-
-                    <div class="stats-row">
-                        <div class="stat-box s-yellow"><span>Impuesto</span><strong id="val-tax2">-$100</strong></div>
-                        <div class="stat-box s-blue"><span>Ganancia Neta</span><strong id="val-net2">$50</strong></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PANTALLA 5 -->
-            <div id="p5" class="screen">
-                <h2>Preguntas de Cierre</h2>
-                <div class="question-block" id="qb1">
-                    <p>1. ¿Por qué el contaminador produce «demasiado» cuando no paga el daño?</p>
-                    <button class="opt-btn" onclick="answer(1, false, this)">Porque el gobierno le da subsidios.</button>
-                    <button class="opt-btn" onclick="answer(1, true, this)">Porque ignora el costo social para maximizar su economía.</button>
-                </div>
-                <div class="question-block" id="qb2" style="display:none;">
-                    <p>2. ¿Por qué el impuesto debe igualar el daño marginal?</p>
-                    <button class="opt-btn" onclick="answer(2, true, this)">Para igualar el costo privado al social y equilibrar las dimensiones.</button>
-                    <button class="opt-btn" onclick="answer(2, false, this)">Para quebrar a la empresa.</button>
-                </div>
-                <div class="question-block" id="qb3" style="display:none;">
-                    <p>3. ¿El impuesto prohíbe producir o solo cambia la cantidad?</p>
-                    <button class="opt-btn" onclick="answer(3, false, this)">Prohíbe la producción.</button>
-                    <button class="opt-btn" onclick="answer(3, true, this)">Solo cambia la cantidad, incentivando a producir lo óptimo.</button>
-                </div>
-            </div>
-
-            <!-- PANTALLA 6 -->
-            <div id="p6" class="screen">
-                <h1>🎉 ¡Equilibrio Logrado!</h1>
-                <div class="character-card c-cyan">
-                    <div class="avatar shape-diamond">🌳</div>
-                    <div class="dialogue"><strong>Conclusión</strong><p>El Impuesto Pigouviano <b>internaliza la externalidad</b>. Al hacer que el Gerente pague por el daño, las 3 dimensiones (Economía, Sociedad, Naturaleza) se mantienen en equilibrio.</p></div>
-                </div>
-                <h2 id="final-score" style="font-size: 40px; margin-top: 20px;">0 / 3</h2>
+            <!-- Botones de Decisión (Se generan con JS) -->
+            <div class="options-container" id="options-container">
+                <!-- Aquí JavaScript inyecta los botones -->
             </div>
         </main>
 
-        <!-- BOTÓN FIJO -->
+        <!-- BOTÓN CONTINUAR -->
         <footer>
-            <button id="btn-action">Continuar ➔</button>
+            <button id="btn-next">Continuar ➔</button>
         </footer>
     </div>
 
     <script>
-        // Esperar a que el HTML esté completamente cargado antes de ejecutar el JS
-        document.addEventListener('DOMContentLoaded', () => {
-            let currentScreen = 1;
-            let score = 0;
-            let timerInterval;
-            let timeLeft = 30;
+        // --- 1. ESTADO DEL JUEGO ---
+        let state = {
+            eco: 50,  // Economía
+            soc: 50,  // Sociedad
+            nat: 50,  // Naturaleza
+            chapter: 0 // Capítulo actual de la historia
+        };
 
-            const btn = document.getElementById('btn-action');
-            const timerDisplay = document.getElementById('timer');
-            const progressBar = document.getElementById('progress');
-            const mainContent = document.getElementById('main-content');
+        // --- 2. LA HISTORIA (8 Escenarios Interactivos) ---
+        const storyData = [
+            {
+                title: "Capítulo 1: La Oportunidad",
+                charName: "El Agricultor",
+                avatar: "👨🏽‍🌾",
+                text: "¡Hola, Gerente! La demanda de chocolate está por las nubes. Si procesamos todo el cacao posible, nos haremos ricos. ¿Qué decides?",
+                options: [
+                    { text: "Producir al 100% (Maximizar dinero)", eco: 30, soc: -10, nat: -30, next: 1 },
+                    { text: "Producir moderadamente (Equilibrio)", eco: 10, soc: 0, nat: -10, next: 1 }
+                ]
+            },
+            {
+                title: "Capítulo 2: El Río se Queja",
+                charName: "La Comunidad",
+                avatar: "👨🏽‍👩🏽‍👧🏽",
+                text: "Gerente, el río está lleno de desechos de tu planta. Los niños se están enfermando. ¡Necesitamos que hagas algo!",
+                options: [
+                    { text: "Ignorarlos, mi prioridad es la empresa.", eco: 10, soc: -30, nat: -20, next: 2 },
+                    { text: "Invertir en filtros de agua (Costo alto).", eco: -20, soc: 30, nat: 30, next: 2 }
+                ]
+            },
+            {
+                title: "Capítulo 3: La Llegada del Estado",
+                charName: "El Estado",
+                avatar: "🏛️",
+                text: "Hemos detectado la Externalidad Negativa. Para proteger el río, impondremos un Impuesto Pigouviano de $10 por tonelada de contaminación.",
+                options: [
+                    { text: "Aceptar el impuesto y adaptarse.", eco: -15, soc: 20, nat: 25, next: 3 },
+                    { text: "Evadir impuestos (Corrupción).", eco: 25, soc: -20, nat: -25, next: 3 }
+                ]
+            },
+            {
+                title: "Capítulo 4: Innovación Agroindustrial",
+                charName: "Tu Ingeniero Jefe",
+                avatar: "👷🏽‍♂️",
+                text: "Con el impuesto, nuestra planta necesita cambiar. Podemos implementar un sistema agroforestal o usar químicos baratos.",
+                options: [
+                    { text: "Sistema Agroforestal (Sombra y árboles).", eco: -10, soc: 10, nat: 30, next: 4 },
+                    { text: "Químicos baratos para acelerar producción.", eco: 20, soc: -10, nat: -30, next: 4 }
+                ]
+            },
+            {
+                title: "Capítulo 5: El Sello Orgánico",
+                charName: "El Consumidor",
+                avatar: "🛒",
+                text: "Vi tu producto. Si obtienes la Certificación Orgánica y de Comercio Justo, estoy dispuesto a pagar el doble por tu chocolate.",
+                options: [
+                    { text: "Pagar la certificación y mejorar procesos.", eco: 25, soc: 20, nat: 20, next: 5 },
+                    { text: "Es mucho papeleo, seguiré vendiendo barato.", eco: -10, soc: -5, nat: 0, next: 5 }
+                ]
+            },
+            {
+                title: "Capítulo 6: El Pago por Servicios Ambientales (PSA)",
+                charName: "El Río",
+                avatar: "🌊",
+                text: "El gobierno ofrece un pago si conservas el bosque de ribera que rodea tu planta para proteger el agua.",
+                options: [
+                    { text: "Aceptar el pago y conservar el bosque.", eco: 15, soc: 15, nat: 30, next: 6 },
+                    { text: "Talar el bosque para sembrar más cacao.", eco: 20, soc: -10, nat: -30, next: 6 }
+                ]
+            },
+            {
+                title: "Capítulo 7: Balance Final",
+                charName: "Junta Directiva",
+                avatar: "👔",
+                text: "Gerente, es momento de revisar los resultados. ¿Cómo queda nuestra empresa y nuestro entorno?",
+                options: [
+                    { text: "Ver Resultados Finales", eco: 0, soc: 0, nat: 0, next: 7 }
+                ]
+            }
+        ];
 
-            // Hacer la función global para que los botones HTML puedan usarla si es necesario
-            window.goToScreen = function(screenNum) {
-                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-                document.getElementById('p' + screenNum).classList.add('active');
-                mainContent.scrollTop = 0;
-                currentScreen = screenNum;
-                updateUI();
-            };
+        // --- 3. LÓGICA DE LA INTERFAZ (DOM) ---
+        const ui = {
+            barEco: document.getElementById('bar-eco'),
+            barSoc: document.getElementById('bar-soc'),
+            barNat: document.getElementById('bar-nat'),
+            charCard: document.getElementById('character-card'),
+            charAvatar: document.getElementById('char-avatar'),
+            charName: document.getElementById('char-name'),
+            storyText: document.getElementById('story-text'),
+            optionsContainer: document.getElementById('options-container'),
+            btnNext: document.getElementById('btn-next'),
+            mainContent: document.getElementById('main-content'),
+            sceneContainer: document.getElementById('scene-container'),
+            sceneIcon: document.getElementById('scene-icon'),
+            body: document.body
+        };
 
-            function updateUI() {
-                btn.style.display = 'block';
-                btn.disabled = false;
-                progressBar.style.width = ((currentScreen - 1) / 5) * 100 + '%';
+        // --- 4. ACTUALIZAR ENTORNO VISUAL ---
+        function updateEnvironment() {
+            // Lógica de colores y emojis basados en la Naturaleza
+            if (state.nat >= 70) {
+                // Entorno Saludable
+                ui.body.style.backgroundColor = "#064e3b"; // Verde oscuro
+                ui.sceneContainer.style.background = "linear-gradient(180deg, #065f46, #022c22)";
+                ui.sceneContainer.style.borderColor = "#10b981";
+                ui.sceneIcon.innerText = "🌳";
+                ui.sceneIcon.style.transform = "scale(1.2)";
+            } else if (state.nat >= 40) {
+                // Entorno Neutro
+                ui.body.style.backgroundColor = "#0f172a"; // Azul oscuro original
+                ui.sceneContainer.style.background = "#0f172a";
+                ui.sceneContainer.style.borderColor = "#334155";
+                ui.sceneIcon.innerText = "🏞️";
+                ui.sceneIcon.style.transform = "scale(1)";
+            } else {
+                // Entorno Contaminado
+                ui.body.style.backgroundColor = "#450a0a"; // Rojo oscuro
+                ui.sceneContainer.style.background = "linear-gradient(180deg, #7f1d1d, #450a0a)";
+                ui.sceneContainer.style.borderColor = "#ef4444";
+                ui.sceneIcon.innerText = "🏭";
+                ui.sceneIcon.style.transform = "scale(1.2)";
+            }
+        }
 
-                switch(currentScreen) {
-                    case 1:
-                        btn.innerText = "Conocer el Conflicto ➔";
-                        btn.onclick = () => window.goToScreen(2);
-                        timerDisplay.style.display = 'none';
-                        break;
-                    case 2:
-                        btn.innerText = "Entendido, ir a la Fábrica ➔";
-                        btn.onclick = () => { window.goToScreen(3); startTimer(); };
-                        break;
-                    case 3:
-                        btn.innerText = "Analizando Impacto...";
-                        btn.disabled = true;
-                        btn.onclick = null;
-                        setTimeout(() => {
-                            if(currentScreen === 3) {
-                                btn.disabled = false;
-                                btn.innerText = "Aceptar Impuesto y Pasar a Fase 2 ➔";
-                                btn.onclick = () => { stopTimer(); window.goToScreen(4); startTimer(); };
-                            }
-                        }, 2000);
-                        break;
-                    case 4:
-                        btn.innerText = "Confirmar y Pasar a Preguntas ➔";
-                        btn.onclick = () => { stopTimer(); window.goToScreen(5); };
-                        break;
-                    case 5:
-                        btn.style.display = 'none'; 
-                        timerDisplay.style.display = 'none';
-                        break;
-                    case 6:
-                        btn.innerText = "Volver a Jugar 🔄";
-                        btn.onclick = () => location.reload();
-                        break;
+        // --- 5. ACTUALIZAR BARRAS ---
+        function updateBars() {
+            // Asegurar que no bajen de 0 ni suban de 100
+            state.eco = Math.max(0, Math.min(100, state.eco));
+            state.soc = Math.max(0, Math.min(100, state.soc));
+            state.nat = Math.max(0, Math.min(100, state.nat));
+
+            ui.barEco.style.width = state.eco + '%';
+            ui.barSoc.style.width = state.soc + '%';
+            ui.barNat.style.width = state.nat + '%';
+
+            // Cambiar color si está crítico
+            ui.barEco.style.background = state.eco < 30 ? '#ef4444' : '#10b981';
+            ui.barSoc.style.background = state.soc < 30 ? '#ef4444' : '#f97316';
+            ui.barNat.style.background = state.nat < 30 ? '#ef4444' : '#06b6d4';
+            
+            updateEnvironment();
+        }
+
+        // --- 6. RENDERIZAR CAPÍTULO ---
+        function renderChapter() {
+            const data = storyData[state.chapter];
+            
+            // Actualizar textos
+            ui.charName.innerText = data.charName;
+            ui.charAvatar.innerText = data.avatar;
+            ui.storyText.innerText = data.text;
+            
+            // Animación de entrada de la tarjeta
+            ui.charCard.style.animation = 'none';
+            ui.charCard.offsetHeight; /* trigger reflow */
+            ui.charCard.style.animation = 'slideIn 0.4s ease forwards';
+
+            // Limpiar botones anteriores
+            ui.optionsContainer.innerHTML = '';
+            ui.btnNext.style.display = 'none';
+
+            // Generar nuevos botones
+            data.options.forEach(option => {
+                const btn = document.createElement('button');
+                btn.className = 'decision-btn';
+                btn.innerText = option.text;
+                btn.onclick = () => makeDecision(option);
+                ui.optionsContainer.appendChild(btn);
+            });
+
+            // Scroll al inicio
+            ui.mainContent.scrollTop = 0;
+        }
+
+        // --- 7. TOMAR DECISIÓN ---
+        function makeDecision(option) {
+            // Aplicar efectos a las dimensiones
+            state.eco += option.eco;
+            state.soc += option.soc;
+            state.nat += option.nat;
+
+            // Actualizar UI
+            updateBars();
+
+            // Deshabilitar botones para que no hagan doble clic
+            const btns = ui.optionsContainer.querySelectorAll('.decision-btn');
+            btns.forEach(b => b.style.pointerEvents = 'none');
+
+            // Mostrar el botón de "Continuar" fijo abajo
+            ui.btnNext.style.display = 'block';
+            
+            // Configurar qué hará el botón continuar
+            ui.btnNext.onclick = () => {
+                state.chapter = option.next;
+                if (state.chapter >= storyData.length) {
+                    showEndGame();
+                } else {
+                    renderChapter();
                 }
+            };
+        }
+
+        // --- 8. PANTALLA FINAL ---
+        function showEndGame() {
+            // Ocultar botón fijo
+            ui.btnNext.style.display = 'none';
+            
+            let finalMessage = "";
+            let title = "";
+            
+            if (state.eco > 60 && state.nat > 60 && state.soc > 60) {
+                title = "🏆 ¡Desarrollo Sostenible!";
+                finalMessage = "Lograste un equilibrio perfecto. Tu empresa es rentable, la comunidad te apoya y el río está limpio. ¡Eres un Ingeniero Agroindustrial ejemplar!";
+            } else if (state.eco > 70 && state.nat < 40) {
+                title = "💸 Rico, pero Destructivo";
+                finalMessage = "Ganaste mucho dinero, pero destruiste el río y la comunidad te odia. El Estado probablemente te clausure pronto. El Impuesto Pigouviano existe para evitar esto.";
+            } else if (state.nat > 70 && state.eco < 40) {
+                title = "🌿 Héroe Ecológico en Banca Rota";
+                finalMessage = "El río está hermoso, pero tu empresa está en quiebra. Recuerda que la economía también importa para el bienestar social.";
+            } else {
+                title = "⚖️ Supervivencia";
+                finalMessage = "No tomaste las mejores decisiones, pero lograste mantener la empresa a flote. Podrías haber maximizado el bienestar social.";
             }
 
-            function star
+            // Modificar la interfaz para mostrar el final
+            document.querySelector('header').style.display = 'none'; // Ocultar barras
+            ui.storyText.innerText = finalMessage;
+            ui.charName.innerText = title;
+            ui.charAvatar.innerText = "📊";
+            
+            // Botón de reiniciar
+            ui.btnNext.innerText = "Jugar de Nuevo 🔄";
+            ui.btnNext.style.display = 'block';
+            ui.btnNext.onclick = () => location.reload();
+            
+            // Actualizar el escenario según el final
+            updateEnvironment();
+            ui.sceneIcon.innerText = "🌍";
+        }
+
+        // --- INICIALIZAR JUEGO ---
+        window.onload = () => {
+            updateBars();
+            renderChapter();
+        };
+
+    </script>
+</body>
+</html>
