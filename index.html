@@ -134,18 +134,43 @@
         #results-screen { display: none; flex-direction: column; animation: slideIn 0.5s ease forwards;}
         
         .score-circle {
-            width: 150px; height: 150px; border-radius: 50%;
+            width: 140px; height: 140px; border-radius: 50%;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             margin: 0 auto 20px auto; border: 6px solid var(--primary);
             background: #0f172a; box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
         }
-        .score-number { font-size: 40px; font-weight: 700; line-height: 1; color: var(--primary);}
+        .score-number { font-size: 38px; font-weight: 700; line-height: 1; color: var(--primary);}
         .score-text { font-size: 12px; color: var(--text-muted); margin-top: 5px;}
 
         .result-title { text-align: center; font-size: 20px; font-weight: 700; margin-bottom: 10px; }
-        .result-desc { text-align: center; font-size: 14px; color: var(--text-muted); margin-bottom: 30px; line-height: 1.5;}
+        .result-desc { text-align: center; font-size: 13px; color: var(--text-muted); margin-bottom: 25px; line-height: 1.5;}
 
-        .history-title { font-size: 16px; font-weight: 700; border-bottom: 2px solid #334155; padding-bottom: 10px; margin-bottom: 15px; color: var(--text-main);}
+        /* NUEVO: RECUENTO FINAL DE DIMENSIONES */
+        .final-dims-container {
+            background: var(--panel-bg);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 25px;
+            border: 1px solid #334155;
+        }
+        .final-dims-title { font-size: 14px; font-weight: 700; text-align: center; margin-bottom: 15px; color: #cbd5e1; text-transform: uppercase; letter-spacing: 1px;}
+        
+        .final-dim-row {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 12px; font-size: 13px; font-weight: 600;
+        }
+        .final-dim-row:last-child { margin-bottom: 0; }
+        
+        .final-dim-label { display: flex; align-items: center; width: 110px; }
+        .final-dim-bar-bg {
+            flex-grow: 1; height: 12px; background: #0f172a; border-radius: 6px; 
+            margin: 0 10px; overflow: hidden; border: 1px solid #334155;
+        }
+        .final-dim-bar-fill { height: 100%; border-radius: 6px; }
+        
+        .final-dim-value { width: 40px; text-align: right; font-size: 15px;}
+
+        .history-title { font-size: 15px; font-weight: 700; border-bottom: 2px solid #334155; padding-bottom: 10px; margin-bottom: 15px; color: var(--text-main);}
         
         .history-item {
             background: var(--panel-bg); padding: 12px; border-radius: 10px;
@@ -185,7 +210,7 @@
 
     <div id="app">
         <header id="top-header">
-            <div class="header-title">Dimensiones de la Empresa</div>
+            <div class="header-title">Dimensiones en Tiempo Real</div>
             <div class="dimension-bars">
                 <div class="dim-row">
                     <div class="dim-label">Economía 💰</div>
@@ -242,7 +267,36 @@
                 <h2 class="result-title" id="result-title">Título</h2>
                 <p class="result-desc" id="result-desc">Descripción final...</p>
 
-                <h3 class="history-title">📋 Reporte de Decisiones</h3>
+                <!-- NUEVO RECUENTO DE VALORES FINALES -->
+                <div class="final-dims-container">
+                    <div class="final-dims-title">📊 Reporte de Dimensiones Finales</div>
+                    
+                    <div class="final-dim-row">
+                        <div class="final-dim-label">Economía 💰</div>
+                        <div class="final-dim-bar-bg">
+                            <div class="final-dim-bar-fill" id="final-bar-eco" style="background: var(--success);"></div>
+                        </div>
+                        <div class="final-dim-value" id="final-val-eco" style="color: var(--success);">0%</div>
+                    </div>
+
+                    <div class="final-dim-row">
+                        <div class="final-dim-label">Sociedad 🏘️</div>
+                        <div class="final-dim-bar-bg">
+                            <div class="final-dim-bar-fill" id="final-bar-soc" style="background: var(--society);"></div>
+                        </div>
+                        <div class="final-dim-value" id="final-val-soc" style="color: var(--society);">0%</div>
+                    </div>
+
+                    <div class="final-dim-row">
+                        <div class="final-dim-label">Naturaleza 🌿</div>
+                        <div class="final-dim-bar-bg">
+                            <div class="final-dim-bar-fill" id="final-bar-nat" style="background: var(--nature);"></div>
+                        </div>
+                        <div class="final-dim-value" id="final-val-nat" style="color: var(--nature);">0%</div>
+                    </div>
+                </div>
+
+                <h3 class="history-title">📋 Historial de Decisiones</h3>
                 <div id="history-container">
                     <!-- Aquí se inyectan las decisiones -->
                 </div>
@@ -261,7 +315,7 @@
         let state = { 
             eco: 50, soc: 50, nat: 50, chapter: 0, 
             score: 0, 
-            history: [] // Aquí guardaremos las decisiones
+            history: [] 
         };
 
         const ui = {
@@ -285,137 +339,58 @@
             btn: document.getElementById('btn-action'),
             mainContent: document.getElementById('main-content'),
             sceneContainer: document.getElementById('scene-container'),
-            sceneIcon: document.getElementById('scene-icon')
+            sceneIcon: document.getElementById('scene-icon'),
+            
+            // Referencias a los nuevos elementos finales
+            finalBarEco: document.getElementById('final-bar-eco'),
+            finalBarSoc: document.getElementById('final-bar-soc'),
+            finalBarNat: document.getElementById('final-bar-nat'),
+            finalValEco: document.getElementById('final-val-eco'),
+            finalValSoc: document.getElementById('final-val-soc'),
+            finalValNat: document.getElementById('final-val-nat')
         };
 
-        // --- HISTORIA ACTUALIZADA CON PUNTOS Y FEEDBACK ---
         const storyData = [
             {
                 charName: "El Agricultor", avatar: "👨🏽‍🌾",
                 text: "¡Hola, Gerente [NAME]! La demanda de chocolate está por las nubes. Si procesamos todo el cacao posible, nos haremos ricos. ¿Qué decides?",
                 options: [
-                    { 
-                        text: "Producir al 100% (Maximizar dinero)", 
-                        eco: 30, soc: -10, nat: -30, next: 1, 
-                        isGood: false, points: 0,
-                        feedback: "Producir sin límites genera una externalidad negativa enorme. El daño social no está siendo pagado."
-                    },
-                    { 
-                        text: "Producir moderadamente (Equilibrio)", 
-                        eco: 10, soc: 0, nat: -10, next: 1, 
-                        isGood: true, points: 100,
-                        feedback: "Buena elección. Un crecimiento controlado permite evaluar los impactos ambientales a tiempo."
-                    }
+                    { text: "Producir al 100% (Maximizar dinero)", eco: 30, soc: -10, nat: -30, next: 1, isGood: false, points: 0, feedback: "Producir sin límites genera una externalidad negativa enorme. El daño social no está siendo pagado." },
+                    { text: "Producir moderadamente (Equilibrio)", eco: 10, soc: 0, nat: -10, next: 1, isGood: true, points: 100, feedback: "Buena elección. Un crecimiento controlado permite evaluar los impactos ambientales a tiempo." }
                 ]
             },
             {
                 charName: "La Comunidad", avatar: "👨🏽‍👩🏽‍👧🏽",
                 text: "Gerente [NAME], el río está lleno de desechos. Los niños se enferman. ¡Necesitamos que hagas algo!",
                 options: [
-                    { 
-                        text: "Ignorarlos, mi prioridad es la empresa.", 
-                        eco: 10, soc: -30, nat: -20, next: 2, 
-                        isGood: false, points: 0,
-                        feedback: "Ignorar a la comunidad destruye la dimensión social. A largo plazo, perderás el 'capital humano'."
-                    },
-                    { 
-                        text: "Invertir en filtros de agua (Costo alto).", 
-                        eco: -20, soc: 30, nat: 30, next: 2, 
-                        isGood: true, points: 100,
-                        feedback: "Invertir en mitigación reduce el costo social y protege el entorno, aunque reduzca la ganancia inicial."
-                    }
+                    { text: "Ignorarlos, mi prioridad es la empresa.", eco: 10, soc: -30, nat: -20, next: 2, isGood: false, points: 0, feedback: "Ignorar a la comunidad destruye la dimensión social. A largo plazo, perderás el 'capital humano'." },
+                    { text: "Invertir en filtros de agua (Costo alto).", eco: -20, soc: 30, nat: 30, next: 2, isGood: true, points: 100, feedback: "Invertir en mitigación reduce el costo social y protege el entorno, aunque reduzca la ganancia inicial." }
                 ]
             },
             {
                 charName: "Ministerio de Ambiente", avatar: "🏛️", isState: true,
                 text: "RESOLUCIÓN N° 402.\nEstimado Gerente [NAME]. Su nivel de Naturaleza está en [NAT]%. Se impone un Impuesto Pigouviano sobre el daño marginal. ¿Acepta la regulación?",
                 options: [
-                    { 
-                        text: "Aceptar el impuesto y adaptar la planta.", 
-                        eco: -15, soc: 20, nat: 25, next: 3, 
-                        isGood: true, points: 100,
-                        feedback: "Aceptar el impuesto internaliza la externalidad. Ahora tu costo privado refleja el costo social."
-                    },
-                    { 
-                        text: "Evadir impuestos (Buscar sobornos).", 
-                        eco: 25, soc: -20, nat: -25, next: 3, 
-                        isGood: false, points: 0,
-                        feedback: "La corrupción es una falla institucional. Te da dinero rápido pero destruye la sociedad y el ambiente."
-                    }
+                    { text: "Aceptar el impuesto y adaptar la planta.", eco: -15, soc: 20, nat: 25, next: 3, isGood: true, points: 100, feedback: "Aceptar el impuesto internaliza la externalidad. Ahora tu costo privado refleja el costo social." },
+                    { text: "Evadir impuestos (Buscar sobornos).", eco: 25, soc: -20, nat: -25, next: 3, isGood: false, points: 0, feedback: "La corrupción es una falla institucional. Te da dinero rápido pero destruye la sociedad y el ambiente." }
                 ]
             },
             {
                 charName: "Ingeniero Jefe", avatar: "👷🏽‍♂️",
                 text: "Jefe [NAME], con el impuesto encima, necesitamos cambiar. Podemos implementar un sistema agroforestal o usar químicos baratos.",
                 options: [
-                    { 
-                        text: "Sistema Agroforestal.", 
-                        eco: -10, soc: 10, nat: 30, next: 4, 
-                        isGood: true, points: 100,
-                        feedback: "El sistema agroforestal es una solución de ingeniería sostenible que protege el suelo y la biodiversidad."
-                    },
-                    { 
-                        text: "Químicos baratos.", 
-                        eco: 20, soc: -10, nat: -30, next: 4, 
-                        isGood: false, points: 0,
-                        feedback: "Los químicos baratos degradan la naturaleza y a la larga encarecen la producción."
-                    }
+                    { text: "Sistema Agroforestal.", eco: -10, soc: 10, nat: 30, next: 4, isGood: true, points: 100, feedback: "El sistema agroforestal es una solución de ingeniería sostenible que protege el suelo y la biodiversidad." },
+                    { text: "Químicos baratos.", eco: 20, soc: -10, nat: -30, next: 4, isGood: false, points: 0, feedback: "Los químicos baratos degradan la naturaleza y a la larga encarecen la producción." }
                 ]
             },
             {
                 charName: "El Consumidor", avatar: "🛒",
                 text: "Gerente [NAME], si obtiene la Certificación Orgánica, pagaré el doble por su chocolate.",
                 options: [
-                    { 
-                        text: "Pagar la certificación.", 
-                        eco: 25, soc: 20, nat: 20, next: 5, 
-                        isGood: true, points: 100,
-                        feedback: "La certificación es una herramienta de mercado que premia la calidad y la sostenibilidad."
-                    },
-                    { 
-                        text: "Mucho papeleo, venderé barato.", 
-                        eco: -10, soc: -5, nat: 0, next: 5, 
-                        isGood: false, points: 0,
-                        feedback: "Renunciar a la certificación te hace competir en desventaja sin aprovechar mercados diferenciados."
-                    }
+                    { text: "Pagar la certificación.", eco: 25, soc: 20, nat: 20, next: 5, isGood: true, points: 100, feedback: "La certificación es una herramienta de mercado que premia la calidad y la sostenibilidad." },
+                    { text: "Mucho papeleo, venderé barato.", eco: -10, soc: -5, nat: 0, next: 5, isGood: false, points: 0, feedback: "Renunciar a la certificación te hace competir en desventaja sin aprovechar mercados diferenciados." }
                 ]
             },
             {
                 charName: "Autoridad Ambiental", avatar: "🏛️", isState: true,
-                text: "NOTIFICACIÓN: Gerente [NAME], el gobierno ofrece un Pago por Servicios Ambientales (PSA) si conserva el bosque de ribera. Si no lo hace, se duplicará su tasa de impuesto.",
-                options: [
-                    { 
-                        text: "Aceptar el PSA y conservar el bosque.", 
-                        eco: 15, soc: 15, nat: 30, next: 6, 
-                        isGood: true, points: 100,
-                        feedback: "El PSA es un instrumento económico que recompensa la conservación del bosque de ribera."
-                    },
-                    { 
-                        text: "Talar el bosque.", 
-                        eco: 20, soc: -10, nat: -30, next: 6, 
-                        isGood: false, points: 0,
-                        feedback: "Talar el bosque genera ganancias a corto plazo pero destruye la cuenca hídrica y la biodiversidad."
-                    }
-                ]
-            },
-            {
-                charName: "Junta Directiva", avatar: "👔",
-                text: "Gerente [NAME], es momento de revisar los resultados del año.",
-                options: [
-                    { text: "Ver Resultados Finales", eco: 0, soc: 0, nat: 0, next: 7, isGood: true, points: 0, feedback: "" }
-                ]
-            }
-        ];
-
-        function updateEnvironment() {
-            if (state.nat >= 70) {
-                ui.sceneContainer.style.background = "linear-gradient(180deg, #065f46, #022c22)";
-                ui.sceneContainer.style.borderColor = "#10b981";
-                ui.sceneIcon.innerText = "🌳";
-            } else if (state.nat >= 40) {
-                ui.sceneContainer.style.background = "#0f172a";
-                ui.sceneContainer.style.borderColor = "#334155";
-                ui.sceneIcon.innerText = "🏞️";
-            } else {
-                ui.sceneContainer.style.background = "linear-gradient(180deg, #7f1d1d, #450a0a)";
-                ui.sceneContaine
+             
