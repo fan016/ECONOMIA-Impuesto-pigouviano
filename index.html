@@ -16,30 +16,20 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
         
         html, body { 
-            height: 100%; 
-            width: 100%;
-            margin: 0; 
-            background-color: var(--bg-dark); 
-            overflow: hidden; /* Evita scroll en el body */
+            height: 100%; width: 100%; margin: 0; 
+            background-color: var(--bg-dark); overflow: hidden; 
         }
 
-        /* CONTENEDOR PRINCIPAL (100% CELULAR) */
+        /* CONTENEDOR PRINCIPAL (APP MÓVIL) */
         #app {
-            width: 100%; 
-            height: 100dvh; /* Altura dinámica real del celular */
-            display: flex; 
-            flex-direction: column; 
-            background: var(--bg-dark);
-            position: relative;
+            width: 100%; height: 100dvh; display: flex; flex-direction: column; 
+            background: var(--bg-dark); position: relative;
         }
 
         /* CABECERA (Barras de dimensión) */
         header {
-            padding: 15px 15px 10px 15px; 
-            background: rgba(30, 41, 59, 0.98);
-            border-bottom: 1px solid rgba(255,255,255,0.1); 
-            flex-shrink: 0; 
-            z-index: 10;
+            padding: 15px 15px 10px 15px; background: rgba(30, 41, 59, 0.98);
+            border-bottom: 1px solid rgba(255,255,255,0.1); flex-shrink: 0; z-index: 10;
         }
         .header-title { text-align: center; font-size: 11px; font-weight: 700; color: var(--text-muted); letter-spacing: 1px; margin-bottom: 8px; text-transform: uppercase;}
         .dimension-bars { display: flex; flex-direction: column; gap: 6px; }
@@ -51,15 +41,10 @@
         .bar-society { background: var(--society); }
         .bar-nature { background: var(--nature); }
 
-        /* ÁREA SCROLLABLE (Donde va la historia) */
+        /* ÁREA SCROLLABLE */
         main { 
-            flex-grow: 1; 
-            overflow-y: auto; 
-            -webkit-overflow-scrolling: touch;
-            padding: 15px; 
-            padding-bottom: 100px; /* Espacio para que el botón fijo no tape el texto */
-            display: flex; 
-            flex-direction: column; 
+            flex-grow: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+            padding: 15px; padding-bottom: 100px; display: flex; flex-direction: column; 
         }
 
         /* ESCENARIO VISUAL (FORMAS CSS) */
@@ -114,7 +99,7 @@
         .character-card.state-doc strong { color: var(--state-color); text-transform: uppercase; font-size: 11px; letter-spacing: 1px;}
         .character-card.state-doc p { font-family: monospace; color: #ddd6fe;}
 
-        /* OPCIONES DE DECISIÓN */
+        /* OPCIONES */
         .instruction-text { text-align: center; font-size: 11px; color: var(--warning); margin-bottom: 10px; font-weight: 600; display: none; }
         .options-container { display: flex; flex-direction: column; gap: 10px;}
         .decision-btn {
@@ -127,14 +112,12 @@
         footer {
             position: fixed; bottom: 0; left: 0; width: 100%;
             padding: 15px 15px calc(15px + env(safe-area-inset-bottom)) 15px;
-            background: linear-gradient(to top, #0f172a 90%, transparent);
-            z-index: 100;
+            background: linear-gradient(to top, #0f172a 90%, transparent); z-index: 100;
         }
         #btn-action {
             background: var(--primary); color: white; border: none; padding: 16px; font-size: 15px;
             font-weight: 700; border-radius: 10px; width: 100%; cursor: pointer; 
-            transition: transform 0.1s, background 0.2s;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: transform 0.1s, background 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
         #btn-action:active { transform: scale(0.96); }
         #btn-action:disabled { background: #475569; color: #94a3b8; box-shadow: none;}
@@ -194,18 +177,15 @@
             </div>
         </header>
 
-        <!-- CONTENIDO SCROLLABLE -->
+        <!-- CONTENIDO -->
         <main id="main-content">
             
-            <!-- JUEGO NORMAL -->
             <div id="game-ui" style="display: flex; flex-direction: column; flex-grow: 1;">
-                
-                <!-- ESCENARIO CON FORMAS CSS -->
+                <!-- ESCENARIO -->
                 <div id="scene">
                     <div class="sky" id="sky"></div>
                     <div class="sun" id="sun"></div>
                     <div class="river" id="river"></div>
-                    
                     <div class="factory">
                         <div class="chimney"></div>
                         <div class="chimney chimney-2"></div>
@@ -213,7 +193,6 @@
                         <div class="smoke smoke-2" id="smoke2"></div>
                         <div class="building"></div>
                     </div>
-
                     <div class="nature">
                         <div class="tree tree-1" id="tree1"></div>
                         <div class="tree tree-2" id="tree2"></div>
@@ -233,7 +212,7 @@
                 <div class="options-container" id="options-container"></div>
             </div>
 
-            <!-- PANTALLA FINAL DE RESULTADOS -->
+            <!-- RESULTADOS -->
             <div id="results-screen">
                 <div class="score-circle">
                     <div class="score-number" id="score-display">0</div>
@@ -266,17 +245,19 @@
             </div>
         </main>
 
-        <!-- BOTÓN FIJO INFERIOR -->
+        <!-- BOTÓN INFERIOR -->
         <footer>
-            <button id="btn-action" disabled>Elige una opción arriba 👆</button>
+            <button id="btn-action" disabled>Cargando sistema...</button>
         </footer>
     </div>
 
     <script>
-        let state = { eco: 50, soc: 50, nat: 50, chapter: 0, score: 0, history: [] };
-        let currentPhase = "playing"; 
-        let nextChapterIndex = 1;
+        // --- ESTADO INICIAL ---
+        let state = { eco: 50, soc: 50, nat: 50, chapter: -1, score: 0, history: [] };
+        let currentPhase = "loading"; 
+        let nextChapterIndex = 0;
 
+        // --- REFERENCIAS DOM ---
         const ui = {
             header: document.getElementById('top-header'),
             gameUI: document.getElementById('game-ui'),
@@ -296,7 +277,6 @@
             btn: document.getElementById('btn-action'),
             mainContent: document.getElementById('main-content'),
             instructionText: document.getElementById('instruction-text'),
-            
             sky: document.getElementById('sky'),
             sun: document.getElementById('sun'),
             river: document.getElementById('river'),
@@ -304,7 +284,6 @@
             tree2: document.getElementById('tree2'),
             smoke1: document.getElementById('smoke1'),
             smoke2: document.getElementById('smoke2'),
-
             finalBarEco: document.getElementById('final-bar-eco'),
             finalBarSoc: document.getElementById('final-bar-soc'),
             finalBarNat: document.getElementById('final-bar-nat'),
@@ -313,6 +292,7 @@
             finalValNat: document.getElementById('final-val-nat')
         };
 
+        // --- HISTORIA (Capítulos) ---
         const storyData = [
             {
                 charName: "El Agricultor", avatar: "👨🏽‍🌾",
@@ -340,4 +320,7 @@
             },
             {
                 charName: "Ingeniero Jefe", avatar: "👷🏽‍♂️",
-                text: "Jefe, con el impuesto encima, necesitamos cambiar. Podemos implementar un sistema ag
+                text: "Jefe, con el impuesto encima, necesitamos cambiar. Podemos implementar un sistema agroforestal o usar químicos baratos.",
+                options: [
+                    { text: "Sistema Agroforestal.", eco: -10, soc: 10, nat: 30, next: 4, isGood: true, points: 100, feedback: "El sistema agroforestal es una solución de ingeniería sostenible que protege el suelo y la biodiversidad." },
+                    { text: "Químicos baratos.", eco: 20, soc: -10, nat: -30, next: 4, isGood: false, poi
