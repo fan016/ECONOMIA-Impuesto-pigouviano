@@ -2,8 +2,9 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EcoSim: El Dilema del Impuesto Pigouviano</title>
+    <!-- Etiqueta crucial para que se vea bien en celulares -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EcoSim: Impuesto Pigouviano</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -17,28 +18,28 @@
             --warning: #f59e0b;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent;}
 
         body {
             background-color: var(--bg-color);
             color: var(--text-main);
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start; /* Permite scroll si el contenido es muy largo */
             min-height: 100vh;
-            overflow: hidden; /* Para evitar scroll durante el juego */
+            padding: 10px;
         }
 
-        /* Contenedor Principal (Simula una app) */
+        /* Contenedor Principal (Diseño de App Móvil) */
         #app-container {
             width: 100%;
-            max-width: 800px;
+            max-width: 480px; /* Ancho máximo ideal para celular */
             background: var(--card-bg);
             border-radius: 20px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            padding: 25px 15px 20px 15px; /* Más padding arriba para el reloj */
             position: relative;
-            min-height: 550px;
+            min-height: 85vh;
             display: flex;
             flex-direction: column;
         }
@@ -46,9 +47,9 @@
         /* Barra de Progreso */
         .progress-bar-container {
             width: 100%;
-            height: 8px;
+            height: 6px;
             background: #334155;
-            border-radius: 4px;
+            border-radius: 3px;
             margin-bottom: 20px;
             overflow: hidden;
         }
@@ -56,16 +57,15 @@
             height: 100%;
             background: var(--primary);
             width: 0%;
-            transition: width 0.5s ease;
+            transition: width 0.4s ease;
         }
 
         /* Pantallas (Ocultas por defecto) */
         .screen {
             display: none;
-            animation: fadeIn 0.5s ease forwards;
+            animation: fadeIn 0.4s ease forwards;
             flex-grow: 1;
             flex-direction: column;
-            justify-content: center;
         }
         .screen.active { display: flex; }
 
@@ -74,93 +74,111 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Tipografía y Elementos */
-        h1 { font-size: 28px; margin-bottom: 15px; color: var(--primary); text-align: center;}
-        h2 { font-size: 22px; margin-bottom: 10px; }
-        p { font-size: 16px; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px; }
+        /* Tipografía Móvil */
+        h1 { font-size: 22px; margin-bottom: 12px; color: var(--primary); text-align: center; line-height: 1.2;}
+        h2 { font-size: 18px; margin-bottom: 10px; text-align: center;}
+        p { font-size: 14px; color: var(--text-muted); line-height: 1.5; margin-bottom: 15px; text-align: center;}
         
-        /* Personajes (Avatares) */
+        /* Personajes */
         .character-box {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             background: #0f172a;
-            padding: 15px;
+            padding: 12px;
             border-radius: 12px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             border-left: 4px solid var(--primary);
         }
         .character-icon {
-            font-size: 40px;
-            margin-right: 15px;
-            filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
+            font-size: 28px;
+            margin-right: 12px;
+            flex-shrink: 0;
         }
-        .character-text strong { color: #fff; display: block; margin-bottom: 5px;}
+        .character-text { font-size: 13px; color: var(--text-muted); line-height: 1.4;}
+        .character-text strong { color: #fff; display: block; margin-bottom: 4px; font-size: 14px;}
 
-        /* Botones */
+        /* Botones Táctiles */
         button {
             background: var(--primary);
             color: white;
             border: none;
-            padding: 12px 24px;
+            padding: 15px;
             font-size: 16px;
             font-weight: 600;
-            border-radius: 8px;
+            border-radius: 12px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             width: 100%;
             margin-top: auto;
+            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
         }
-        button:hover { background: #2563eb; transform: translateY(-2px); }
-        button:disabled { background: #475569; cursor: not-allowed; transform: none; }
+        button:active { transform: scale(0.97); } /* Efecto al presionar en celular */
+        button:disabled { background: #475569; box-shadow: none; cursor: not-allowed; transform: none; }
 
         /* Juego: Sliders y Estadísticas */
-        .game-area { background: #0f172a; padding: 25px; border-radius: 16px; }
+        .game-area { background: #0f172a; padding: 15px; border-radius: 16px; margin-bottom: 15px;}
         
-        .slider-container { margin: 20px 0; text-align: center; }
+        .slider-container { margin: 10px 0 20px 0; text-align: center; }
         input[type=range] {
             width: 100%;
-            height: 10px;
-            border-radius: 5px;
+            height: 12px;
+            border-radius: 6px;
             background: #334155;
             outline: none;
             -webkit-appearance: none;
+            margin-top: 10px;
         }
+        /* Pulgar grande para dedos */
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 25px;
-            height: 25px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             background: var(--primary);
             cursor: pointer;
-            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.6);
         }
 
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        /* Grid de estadísticas adaptable */
+        .stats-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; /* 2 columnas en móvil */
+            gap: 10px; 
+        }
+        .stats-grid.three-cols { grid-template-columns: 1fr; } /* 3 métricas se apilan en móvil */
+        
         .stat-card {
             background: var(--card-bg);
-            padding: 15px;
+            padding: 10px;
             border-radius: 8px;
             text-align: center;
             border-bottom: 3px solid;
         }
         .stat-card.profit { border-color: var(--success); }
         .stat-card.damage { border-color: var(--danger); }
-        .stat-value { font-size: 24px; font-weight: 700; margin-top: 5px; }
+        .stat-card.tax { border-color: var(--warning); }
+        .stat-card.net { border-color: var(--primary); background: rgba(59,130,246,0.1); }
+        
+        .stat-label { font-size: 11px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 5px;}
+        .stat-value { font-size: 18px; font-weight: 700; }
         .stat-value.green { color: var(--success); }
         .stat-value.red { color: var(--danger); }
+        .stat-value.yellow { color: var(--warning); }
+        .stat-value.blue { color: var(--primary); }
 
         /* Temporizador */
         .timer-box {
             position: absolute;
-            top: -20px;
-            right: 20px;
+            top: 15px;
+            right: 15px;
             background: var(--warning);
             color: #000;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 18px;
-            box-shadow: 0 4px 10px rgba(245, 158, 11, 0.4);
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-weight: 700;
+            font-size: 14px;
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+            z-index: 10;
         }
 
         /* Alertas */
@@ -168,61 +186,56 @@
             padding: 10px;
             border-radius: 8px;
             margin-top: 15px;
-            font-size: 14px;
+            font-size: 12px;
             display: none;
+            text-align: center;
         }
-        .alert.danger { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid var(--danger); }
-        .alert.success { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid var(--success); }
+        .alert.danger { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid var(--danger); display: block;}
+        .alert.success { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid var(--success); display: block;}
 
         /* Preguntas Finales */
-        .question-box { margin-bottom: 15px; background: #0f172a; padding: 15px; border-radius: 8px;}
-        .options { display: flex; flex-direction: column; gap: 10px; margin-top: 10px;}
+        .question-box { margin-bottom: 12px; background: #0f172a; padding: 12px; border-radius: 10px;}
+        .question-box p { text-align: left; font-size: 13px; color: #fff; margin-bottom: 10px;}
+        .options { display: flex; flex-direction: column; gap: 8px;}
         .option-btn {
             background: #1e293b; color: #fff; border: 1px solid #475569;
-            text-align: left; padding: 10px 15px; margin: 0; font-weight: 400;
+            text-align: left; padding: 12px; margin: 0; font-size: 13px; font-weight: 400;
+            box-shadow: none;
         }
-        .option-btn:hover { background: #334155; }
+        .option-btn:active { background: #334155; }
         .option-btn.correct { background: var(--success); border-color: var(--success); }
         .option-btn.wrong { background: var(--danger); border-color: var(--danger); }
 
-        .tax-toggle-box {
-            display: flex; align-items: center; justify-content: center;
-            margin-top: 15px; padding: 10px; background: rgba(59, 130, 246, 0.1);
-            border-radius: 8px; border: 1px dashed var(--primary);
-        }
-        .tax-toggle-box input { width: 20px; height: 20px; margin-right: 10px; cursor: pointer;}
-        
-        .final-score { font-size: 50px; text-align: center; margin: 20px 0; font-weight: bold; color: var(--primary);}
+        .final-score { font-size: 40px; text-align: center; margin: 20px 0; font-weight: bold; color: var(--primary);}
     </style>
 </head>
 <body>
 
     <div id="app-container">
-        <!-- Barra de progreso global -->
+        <!-- Temporizador -->
+        <div class="timer-box" id="timerDisplay" style="display: none;">⏱️ 30s</div>
+
+        <!-- Barra de progreso -->
         <div class="progress-bar-container">
             <div class="progress-bar" id="progressBar"></div>
         </div>
 
-        <!-- TEMPORIZADOR (Solo visible en el juego) -->
-        <div class="timer-box" id="timerDisplay" style="display: none;">⏱️ 30s</div>
-
         <!-- PANTALLA 1: INICIO -->
         <div class="screen active" id="screen-start">
             <h1>🌍 EcoSim: El Dilema del Cacao</h1>
-            <p style="text-align: center;">Bienvenido, Ingeniero Agroindustrial. En esta actividad tomarás decisiones reales sobre una planta procesadora de cacao.</p>
+            <p>Bienvenido, Ingeniero Agroindustrial. Toma decisiones sobre tu planta procesadora.</p>
             
             <div class="character-box" style="border-color: var(--primary);">
                 <div class="character-icon">👨🏽‍🏫</div>
                 <div class="character-text">
                     <strong>Profesor Virtual</strong>
-                    Tu objetivo es maximizar tus ganancias, pero cuidado... tus decisiones afectan a la sociedad. Tienes 30 segundos por fase. ¡Empecemos!
+                    Tu objetivo es maximizar tus ganancias. Cuidado, tus decisiones afectan a la sociedad. Tienes 30s por fase.
                 </div>
             </div>
-
             <button onclick="startConcept()">Comenzar Explicación ➔</button>
         </div>
 
-        <!-- PANTALLA 2: CONCEPTO (Explicación corta) -->
+        <!-- PANTALLA 2: CONCEPTO -->
         <div class="screen" id="screen-concept">
             <h2>La Falla de Mercado</h2>
             
@@ -230,7 +243,7 @@
                 <div class="character-icon">🏭</div>
                 <div class="character-text">
                     <strong>La Empresa (Tú)</strong>
-                    Producir cacao me cuesta dinero (mano de obra, máquinas). Si vendo mucho, gano mucho. Es simple.
+                    Producir me cuesta dinero. Si vendo mucho, gano mucho. Es simple.
                 </div>
             </div>
             
@@ -238,7 +251,7 @@
                 <div class="character-icon">👨🏽‍🌾</div>
                 <div class="character-text">
                     <strong>La Comunidad</strong>
-                    ¡Oye! ¡Tus desechos van al río y enferman a mi familia! Eso es un <b>Costo Social</b> que tú no pagas.
+                    ¡Tus desechos van al río! Eso es un <b>Costo Social</b> que tú no pagas.
                 </div>
             </div>
 
@@ -246,7 +259,7 @@
                 <div class="character-icon">🏛️</div>
                 <div class="character-text">
                     <strong>El Estado</strong>
-                    Para solucionar esto, aplicaré un <b>Impuesto Pigouviano</b>: te cobraré exactamente el valor del daño que causas, para que lo incluyas en tu bolsillo.
+                    Aplicaré un <b>Impuesto Pigouviano</b>: te cobraré el valor del daño para que lo incluyas en tu bolsillo.
                 </div>
             </div>
 
@@ -255,26 +268,26 @@
 
         <!-- PANTALLA 3: JUEGO FASE 1 -->
         <div class="screen" id="screen-game1">
-            <h2 style="text-align: center;">Fase 1: Libre Mercado</h2>
-            <p style="text-align: center;">Mueve el control para elegir tu nivel de producción. Maximiza tu ganancia.</p>
+            <h2>Fase 1: Libre Mercado</h2>
+            <p>Mueve el control (desliza con tu dedo) para elegir tu nivel de producción. Maximiza tu ganancia.</p>
             
             <div class="game-area">
                 <div class="slider-container">
-                    <h3 id="prod-label">10 Toneladas</h3>
+                    <h3 id="prod-label" style="color:var(--primary); font-size: 20px;">10 Toneladas</h3>
                     <input type="range" id="slider1" min="0" max="20" value="10" step="1">
                 </div>
                 
                 <div class="stats-grid">
                     <div class="stat-card profit">
-                        <div>Ganancia Privada</div>
+                        <div class="stat-label">Ganancia</div>
                         <div class="stat-value green" id="profit1">$0</div>
                     </div>
                     <div class="stat-card damage">
-                        <div>Costo Social (Daño)</div>
+                        <div class="stat-label">Daño Social</div>
                         <div class="stat-value red" id="damage1">$0</div>
                     </div>
                 </div>
-                <div class="alert danger" id="alert1">⚠️ Estás generando más daño del que ganas. La sociedad está pagando tu producción.</div>
+                <div class="alert danger" id="alert1">⚠️ Generas más daño del que ganas. La sociedad paga tu producción.</div>
             </div>
 
             <button id="btn-next-phase" onclick="startGamePhase2()" disabled>Esperando decisión... (30s)</button>
@@ -282,47 +295,44 @@
 
         <!-- PANTALLA 4: JUEGO FASE 2 -->
         <div class="screen" id="screen-game2">
-            <h2 style="text-align: center;">Fase 2: Intervención del Estado</h2>
-            <p style="text-align: center;">El Estado ha aplicado un impuesto de <b>$10 por tonelada</b> (igual al daño marginal).</p>
+            <h2>Fase 2: Impuesto del Estado</h2>
+            <p>El Estado aplica un impuesto de <b>$10 por tonelada</b> (igual al daño marginal).</p>
             
             <div class="game-area">
                 <div class="slider-container">
-                    <h3 id="prod-label2">10 Toneladas</h3>
+                    <h3 id="prod-label2" style="color:var(--warning); font-size: 20px;">10 Toneladas</h3>
                     <input type="range" id="slider2" min="0" max="20" value="10" step="1">
                 </div>
                 
-                <div class="stats-grid" style="grid-template-columns: 1fr 1fr 1fr;">
-                    <div class="stat-card profit" style="border-color: var(--primary);">
-                        <div>Ganancia Bruta</div>
-                        <div class="stat-value" id="profit2" style="color: var(--primary);">$0</div>
+                <!-- En móvil, las 3 métricas se ponen en una columna para que se lean bien -->
+                <div class="stats-grid three-cols">
+                    <div class="stat-card tax">
+                        <div class="stat-label">Impuesto Pagado</div>
+                        <div class="stat-value yellow" id="tax2">$0</div>
                     </div>
-                    <div class="stat-card damage" style="border-color: var(--warning);">
-                        <div>Impuesto Pagado</div>
-                        <div class="stat-value" id="tax2" style="color: var(--warning);">$0</div>
-                    </div>
-                    <div class="stat-card profit">
-                        <div>Ganancia Neta</div>
-                        <div class="stat-value green" id="net2">$0</div>
+                    <div class="stat-card net">
+                        <div class="stat-label">Ganancia Neta Final</div>
+                        <div class="stat-value blue" id="net2">$0</div>
                     </div>
                 </div>
-                <div class="alert success" id="alert2">✅ ¡Has internalizado la externalidad! Ahora producir de más te cuesta dinero.</div>
+                <div class="alert success" id="alert2">✅ ¡Has internalizado la externalidad! Producir de más ahora te cuesta.</div>
             </div>
 
             <button onclick="startQuiz()">Confirmar y Pasar a Preguntas ➔</button>
         </div>
 
-        <!-- PANTALLA 5: PREGUNTAS DEL CORREO -->
+        <!-- PANTALLA 5: PREGUNTAS -->
         <div class="screen" id="screen-quiz">
-            <h2 style="text-align: center;">Preguntas para pensar</h2>
-            <p style="text-align: center;">Responde correctamente para validar la actividad con tu profesor.</p>
+            <h2>Preguntas para pensar</h2>
+            <p>Responde para validar la actividad.</p>
 
             <!-- Pregunta 1 -->
             <div class="question-box">
-                <p><strong>1. ¿Por qué el contaminador produce «demasiado» cuando no paga el daño?</strong></p>
+                <p><strong>1. ¿Por qué produce «demasiado» sin pagar el daño?</strong></p>
                 <div class="options" id="q1-options">
                     <button class="option-btn" onclick="checkAnswer(1, 'wrong', this)">Porque el gobierno le da subsidios.</button>
-                    <button class="option-btn" onclick="checkAnswer(1, 'correct', this)">Porque su costo privado es menor al costo social, ignorando el daño.</button>
-                    <button class="option-btn" onclick="checkAnswer(1, 'wrong', this)">Porque los consumidores exigen mucha calidad.</button>
+                    <button class="option-btn" onclick="checkAnswer(1, 'correct', this)">Porque su costo privado es menor al costo social.</button>
+                    <button class="option-btn" onclick="checkAnswer(1, 'wrong', this)">Porque los consumidores exigen calidad.</button>
                 </div>
             </div>
 
@@ -330,33 +340,32 @@
             <div class="question-box" id="q2-box" style="display: none;">
                 <p><strong>2. ¿Por qué el impuesto debe igualar el daño marginal?</strong></p>
                 <div class="options" id="q2-options">
-                    <button class="option-btn" onclick="checkAnswer(2, 'correct', this)">Para que el costo privado se iguale al costo social y se produzca lo óptimo.</button>
-                    <button class="option-btn" onclick="checkAnswer(2, 'wrong', this)">Para quebrar a la empresa contaminante.</button>
+                    <button class="option-btn" onclick="checkAnswer(2, 'correct', this)">Para igualar el costo privado al social y producir lo óptimo.</button>
+                    <button class="option-btn" onclick="checkAnswer(2, 'wrong', this)">Para quebrar a la empresa.</button>
                 </div>
             </div>
 
             <!-- Pregunta 3 -->
             <div class="question-box" id="q3-box" style="display: none;">
-                <p><strong>3. ¿El impuesto prohíbe producir o solo cambia la cantidad?</strong></p>
+                <p><strong>3. ¿El impuesto prohíbe o cambia la cantidad?</strong></p>
                 <div class="options" id="q3-options">
-                    <button class="option-btn" onclick="checkAnswer(3, 'wrong', this)">Prohíbe la producción de inmediato.</button>
-                    <button class="option-btn" onclick="checkAnswer(3, 'correct', this)">Solo cambia la cantidad, incentivando a producir menos por los costos.</button>
+                    <button class="option-btn" onclick="checkAnswer(3, 'wrong', this)">Prohíbe la producción.</button>
+                    <button class="option-btn" onclick="checkAnswer(3, 'correct', this)">Cambia la cantidad, incentivando a producir menos.</button>
                 </div>
             </div>
 
-            <button id="btn-finish-quiz" style="display: none;" onclick="showResults()">Ver Resultados Finales ➔</button>
+            <button id="btn-finish-quiz" style="display: none;" onclick="showResults()">Ver Resultados ➔</button>
         </div>
 
         <!-- PANTALLA 6: RESULTADOS -->
         <div class="screen" id="screen-results">
-            <h1>🎉 ¡Actividad Completada!</h1>
-            <p style="text-align: center;">Has comprendido cómo los instrumentos económicos corrigen las fallas de mercado.</p>
+            <h1>🎉 ¡Completado!</h1>
             
             <div class="character-box" style="border-color: var(--success);">
                 <div class="character-icon">🌳</div>
                 <div class="character-text">
                     <strong>Conclusión</strong>
-                    El Impuesto Pigouviano no prohíbe, sino que <b>internaliza la externalidad</b>. Al hacer que el contaminador pague el costo social, la producción se ajusta al nivel donde el beneficio para la sociedad es máximo. ¡Bien hecho, Ingeniero!
+                    El Impuesto Pigouviano <b>internaliza la externalidad</b>. Hace que el contaminador pague el costo social, ajustando la producción al nivel óptimo para la sociedad.
                 </div>
             </div>
 
@@ -368,33 +377,30 @@
     </div>
 
     <script>
-        // Variables globales
-        let currentProgress = 0;
         let score = 0;
         let timerInterval;
         let timeLeft = 30;
 
         // Constantes del juego
-        const marginalProfit = 15; // $15 ganancia por tonelada
-        const marginalDamage = 10; // $10 daño por tonelada
-        const taxRate = 10; // Impuesto de $10
+        const marginalProfit = 15; 
+        const marginalDamage = 10; 
+        const taxRate = 10; 
 
-        // Referencias DOM
         const progressBar = document.getElementById('progressBar');
         const timerDisplay = document.getElementById('timerDisplay');
 
-        // Función para cambiar de pantalla
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
+            // Hacer scroll al inicio de la pantalla en móviles
+            window.scrollTo(0,0); 
         }
 
-        // Actualizar barra de progreso
         function updateProgress(percent) {
             progressBar.style.width = percent + '%';
         }
 
-        // --- MANEJO DEL TIEMPO ---
+        // Manejo del tiempo
         function startTimer(onEnd) {
             timeLeft = 30;
             timerDisplay.style.display = 'block';
@@ -424,13 +430,12 @@
             timerDisplay.style.display = 'none';
         }
 
-        // --- FLUJO DEL JUEGO ---
+        // Flujo
         function startConcept() {
             updateProgress(16);
             showScreen('screen-concept');
         }
 
-        // FASE 1: SIN IMPUESTO
         function startGamePhase1() {
             updateProgress(33);
             showScreen('screen-game1');
@@ -441,7 +446,6 @@
             const damageEl = document.getElementById('damage1');
             const alertEl = document.getElementById('alert1');
 
-            // Iniciar tiempo para esta fase
             startTimer(() => {
                 document.getElementById('btn-next-phase').disabled = false;
                 document.getElementById('btn-next-phase').innerText = "El tiempo terminó. Pasar a Fase 2 ➔";
@@ -464,16 +468,24 @@
                 }
             });
 
-            // Habilitar botón manualmente si el usuario quiere avanzar antes
             document.getElementById('btn-next-phase').disabled = false;
             document.getElementById('btn-next-phase').innerText = "Pasar a Fase 2 ➔";
         }
 
-        // FASE 2: CON IMPUESTO
         function startGamePhase2() {
             stopTimer();
             updateProgress(50);
             showScreen('screen-game2');
 
             const slider = document.getElementById('slider2');
-            const label = document.get
+            const label = document.getElementById('prod-label2');
+            const taxEl = document.getElementById('tax2');
+            const netEl = document.getElementById('net2');
+            const alertEl = document.getElementById('alert2');
+
+            startTimer(() => {
+                startQuiz();
+            });
+
+            slider.addEventListener('input', () => {
+                let prod = parseInt(slider.v
