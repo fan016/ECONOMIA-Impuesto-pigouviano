@@ -20,13 +20,13 @@
             background-color: var(--bg-dark); overflow: hidden; 
         }
 
-        /* CONTENEDOR PRINCIPAL (APP MÓVIL) */
+        /* CONTENEDOR PRINCIPAL */
         #app {
             width: 100%; height: 100dvh; display: flex; flex-direction: column; 
             background: var(--bg-dark); position: relative;
         }
 
-        /* CABECERA (Barras de dimensión) */
+        /* CABECERA */
         header {
             padding: 15px 15px 10px 15px; background: rgba(30, 41, 59, 0.98);
             border-bottom: 1px solid rgba(255,255,255,0.1); flex-shrink: 0; z-index: 10;
@@ -47,36 +47,30 @@
             padding: 15px; padding-bottom: 100px; display: flex; flex-direction: column; 
         }
 
-        /* ESCENARIO VISUAL (FORMAS CSS) */
+        /* ESCENARIO VISUAL */
         #scene {
             width: 100%; height: 140px; border-radius: 12px; margin-bottom: 15px;
             position: relative; overflow: hidden; border: 2px solid #334155;
             flex-shrink: 0; background: #0f172a; transition: border-color 0.5s;
         }
-
         .sky { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #38bdf8; transition: background 1s ease; }
         .sky.polluted { background: #78350f; }
-
         .sun { position: absolute; top: 15px; right: 20px; width: 30px; height: 30px; background: #fde047; border-radius: 50%; box-shadow: 0 0 15px #fde047; transition: all 1s; }
         .sun.polluted { opacity: 0.2; transform: scale(0.8); background: #9ca3af; box-shadow: none;}
-
         .factory { position: absolute; bottom: 0; left: 10%; width: 80px; height: 60px; display: flex; align-items: flex-end; }
         .building { width: 60px; height: 40px; background: #475569; border: 2px solid #334155; position: relative; z-index: 2; }
         .chimney { position: absolute; bottom: 40px; left: 5px; width: 15px; height: 35px; background: #334155; border: 2px solid #1e293b; z-index: 1; }
         .chimney-2 { left: 30px; height: 25px; }
-
         .smoke { position: absolute; width: 15px; height: 15px; background: #64748b; border-radius: 50%; bottom: 75px; left: 10px; opacity: 0; transition: opacity 1s; animation: floatSmoke 3s infinite linear; }
         .smoke-2 { left: 35px; bottom: 65px; animation-delay: 1.5s; width: 20px; height: 20px; }
         .smoke.active { opacity: 0.9; background: #1f2937; }
         @keyframes floatSmoke { 0% { transform: translateY(0) scale(1); opacity: 0.8; } 100% { transform: translateY(-30px) scale(2); opacity: 0; } }
-
         .nature { position: absolute; bottom: 0; right: 5%; width: 100px; height: 50px; z-index: 3; }
         .tree { position: absolute; bottom: 0; width: 20px; height: 20px; background: #22c55e; border-radius: 50% 50% 0 0; transition: all 1s; }
         .tree::after { content: ''; position: absolute; bottom: -12px; left: 8px; width: 4px; height: 12px; background: #78350f; }
         .tree-1 { right: 10px; bottom: 10px; }
         .tree-2 { right: 30px; bottom: 5px; width: 15px; height: 15px; }
         .tree.polluted { background: #78350f; transform: scale(0.7); }
-
         .river { position: absolute; bottom: 0; right: 0; width: 100%; height: 8px; background: #0284c7; transition: background 1s; }
         .river.polluted { background: #451a03; }
 
@@ -158,44 +152,30 @@
 <body>
 
     <div id="app">
-        <!-- CABECERA -->
         <header id="top-header">
             <div class="header-title">Dimensiones en Tiempo Real</div>
             <div class="dimension-bars">
-                <div class="dim-row">
-                    <div class="dim-label">Economía 💰</div>
-                    <div class="bar-bg"><div class="bar-fill bar-economy" id="bar-eco"></div></div>
-                </div>
-                <div class="dim-row">
-                    <div class="dim-label">Sociedad 🏘️</div>
-                    <div class="bar-bg"><div class="bar-fill bar-society" id="bar-soc"></div></div>
-                </div>
-                <div class="dim-row">
-                    <div class="dim-label">Naturaleza 🌿</div>
-                    <div class="bar-bg"><div class="bar-fill bar-nature" id="bar-nat"></div></div>
-                </div>
+                <div class="dim-row"><div class="dim-label">Economía 💰</div><div class="bar-bg"><div class="bar-fill bar-economy" id="bar-eco"></div></div></div>
+                <div class="dim-row"><div class="dim-label">Sociedad 🏘️</div><div class="bar-bg"><div class="bar-fill bar-society" id="bar-soc"></div></div></div>
+                <div class="dim-row"><div class="dim-label">Naturaleza 🌿</div><div class="bar-bg"><div class="bar-fill bar-nature" id="bar-nat"></div></div></div>
             </div>
         </header>
 
-        <!-- CONTENIDO -->
         <main id="main-content">
-            
             <div id="game-ui" style="display: flex; flex-direction: column; flex-grow: 1;">
+                
                 <!-- ESCENARIO -->
                 <div id="scene">
                     <div class="sky" id="sky"></div>
                     <div class="sun" id="sun"></div>
                     <div class="river" id="river"></div>
                     <div class="factory">
-                        <div class="chimney"></div>
-                        <div class="chimney chimney-2"></div>
-                        <div class="smoke" id="smoke1"></div>
-                        <div class="smoke smoke-2" id="smoke2"></div>
+                        <div class="chimney"></div><div class="chimney chimney-2"></div>
+                        <div class="smoke" id="smoke1"></div><div class="smoke smoke-2" id="smoke2"></div>
                         <div class="building"></div>
                     </div>
                     <div class="nature">
-                        <div class="tree tree-1" id="tree1"></div>
-                        <div class="tree tree-2" id="tree2"></div>
+                        <div class="tree tree-1" id="tree1"></div><div class="tree tree-2" id="tree2"></div>
                     </div>
                 </div>
 
@@ -245,38 +225,32 @@
             </div>
         </main>
 
-        <!-- BOTÓN INFERIOR -->
         <footer>
-            <button id="btn-action" disabled>Cargando sistema...</button>
+            <button id="btn-action">Aceptar el Reto e Iniciar ➔</button>
         </footer>
     </div>
 
     <script>
-        // --- ESTADO INICIAL ---
+        // ESTADO GLOBAL
         let state = { eco: 50, soc: 50, nat: 50, chapter: -1, score: 0, history: [] };
-        let currentPhase = "loading"; 
-        let nextChapterIndex = 0;
+        let currentPhase = "intro"; 
 
-        // --- REFERENCIAS DOM ---
         const ui = {
-            header: document.getElementById('top-header'),
-            gameUI: document.getElementById('game-ui'),
-            resultsScreen: document.getElementById('results-screen'),
-            historyContainer: document.getElementById('history-container'),
-            scoreDisplay: document.getElementById('score-display'),
-            resultTitle: document.getElementById('result-title'),
-            resultDesc: document.getElementById('result-desc'),
-            barEco: document.getElementById('bar-eco'),
-            barSoc: document.getElementById('bar-soc'),
-            barNat: document.getElementById('bar-nat'),
-            charCard: document.getElementById('character-card'),
-            charAvatar: document.getElementById('char-avatar'),
             charName: document.getElementById('char-name'),
+            charAvatar: document.getElementById('char-avatar'),
             storyText: document.getElementById('story-text'),
             optionsContainer: document.getElementById('options-container'),
             btn: document.getElementById('btn-action'),
             mainContent: document.getElementById('main-content'),
             instructionText: document.getElementById('instruction-text'),
+            charCard: document.getElementById('character-card'),
+            
+            // Barras de dimensión
+            barEco: document.getElementById('bar-eco'),
+            barSoc: document.getElementById('bar-soc'),
+            barNat: document.getElementById('bar-nat'),
+            
+            // Escenario
             sky: document.getElementById('sky'),
             sun: document.getElementById('sun'),
             river: document.getElementById('river'),
@@ -284,6 +258,15 @@
             tree2: document.getElementById('tree2'),
             smoke1: document.getElementById('smoke1'),
             smoke2: document.getElementById('smoke2'),
+            
+            // Resultados
+            gameUI: document.getElementById('game-ui'),
+            resultsScreen: document.getElementById('results-screen'),
+            header: document.getElementById('top-header'),
+            scoreDisplay: document.getElementById('score-display'),
+            resultTitle: document.getElementById('result-title'),
+            resultDesc: document.getElementById('result-desc'),
+            historyContainer: document.getElementById('history-container'),
             finalBarEco: document.getElementById('final-bar-eco'),
             finalBarSoc: document.getElementById('final-bar-soc'),
             finalBarNat: document.getElementById('final-bar-nat'),
@@ -292,7 +275,6 @@
             finalValNat: document.getElementById('final-val-nat')
         };
 
-        // --- HISTORIA (Capítulos) ---
         const storyData = [
             {
                 charName: "El Agricultor", avatar: "👨🏽‍🌾",
@@ -306,21 +288,29 @@
                 charName: "La Comunidad", avatar: "👨🏽‍👩🏽‍👧🏽",
                 text: "Gerente, el río está lleno de desechos. Los niños se enferman. ¡Necesitamos que hagas algo!",
                 options: [
-                    { text: "Ignorarlos, mi prioridad es la empresa.", eco: 10, soc: -30, nat: -20, next: 2, isGood: false, points: 0, feedback: "Ignorar a la comunidad destruye la dimensión social. A largo plazo, perderás el 'capital humano'." },
-                    { text: "Invertir en filtros de agua (Costo alto).", eco: -20, soc: 30, nat: 30, next: 2, isGood: true, points: 100, feedback: "Invertir en mitigación reduce el costo social y protege el entorno, aunque reduzca la ganancia inicial." }
+                    { text: "Ignorarlos, mi prioridad es la empresa.", eco: 10, soc: -30, nat: -20, next: 2, isGood: false, points: 0, feedback: "Ignorar a la comunidad destruye la dimensión social." },
+                    { text: "Invertir en filtros de agua (Costo alto).", eco: -20, soc: 30, nat: 30, next: 2, isGood: true, points: 100, feedback: "Invertir en mitigación reduce el costo social y protege el entorno." }
                 ]
             },
             {
                 charName: "Ministerio de Ambiente", avatar: "🏛️", isState: true,
                 text: "RESOLUCIÓN N° 402.\nEstimado Gerente. Su nivel de Naturaleza está en [NAT]%. Se impone un Impuesto Pigouviano sobre el daño marginal. ¿Acepta la regulación?",
                 options: [
-                    { text: "Aceptar el impuesto y adaptar la planta.", eco: -15, soc: 20, nat: 25, next: 3, isGood: true, points: 100, feedback: "Aceptar el impuesto internaliza la externalidad. Ahora tu costo privado refleja el costo social." },
-                    { text: "Evadir impuestos (Buscar sobornos).", eco: 25, soc: -20, nat: -25, next: 3, isGood: false, points: 0, feedback: "La corrupción es una falla institucional. Te da dinero rápido pero destruye la sociedad y el ambiente." }
+                    { text: "Aceptar el impuesto y adaptar la planta.", eco: -15, soc: 20, nat: 25, next: 3, isGood: true, points: 100, feedback: "Aceptar el impuesto internaliza la externalidad." },
+                    { text: "Evadir impuestos (Buscar sobornos).", eco: 25, soc: -20, nat: -25, next: 3, isGood: false, points: 0, feedback: "La corrupción destruye la sociedad y el ambiente." }
                 ]
             },
             {
                 charName: "Ingeniero Jefe", avatar: "👷🏽‍♂️",
                 text: "Jefe, con el impuesto encima, necesitamos cambiar. Podemos implementar un sistema agroforestal o usar químicos baratos.",
                 options: [
-                    { text: "Sistema Agroforestal.", eco: -10, soc: 10, nat: 30, next: 4, isGood: true, points: 100, feedback: "El sistema agroforestal es una solución de ingeniería sostenible que protege el suelo y la biodiversidad." },
-                    { text: "Químicos baratos.", eco: 20, soc: -10, nat: -30, next: 4, isGood: false, poi
+                    { text: "Sistema Agroforestal.", eco: -10, soc: 10, nat: 30, next: 4, isGood: true, points: 100, feedback: "El sistema agroforestal protege el suelo y la biodiversidad." },
+                    { text: "Químicos baratos.", eco: 20, soc: -10, nat: -30, next: 4, isGood: false, points: 0, feedback: "Los químicos degradan la naturaleza." }
+                ]
+            },
+            {
+                charName: "El Consumidor", avatar: "🛒",
+                text: "Gerente, si obtiene la Certificación Orgánica, pagaré el doble por su chocolate.",
+                options: [
+                    { text: "Pagar la certificación.", eco: 25, soc: 20, nat: 20, next: 5, isGood: true, points: 100, feedback: "La certificación premia la calidad y la sostenibilidad." },
+                    { text: "Mucho papeleo, venderé barato.", eco: -10, soc: -5, nat: 0, next: 5, isGood: false, points: 0, 
